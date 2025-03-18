@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    // AQI colour code
+    <color name="aqi_good">#00E400</color>
+    <color name="aqi_moderate">#FFFF00</color>
+    <color name="aqi_unhealthy_sensitive">#FF7E00</color>
+    <color name="aqi_unhealthy">#FF0000</color>
+    <color name="aqi_very_unhealthy">#8F3F97</color>
+    <color name="aqi_hazardous">#7E0023</color>
 </resources>
