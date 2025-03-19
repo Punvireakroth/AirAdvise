@@ -35,7 +35,7 @@ interface ApiService {
     // Locations --------
     @GET("locations")
     suspend fun getLocations(): Response<List<Location>>
-    
+
     @GET("locations/{id}")
     suspend fun getLocation(@Path("id") id: Long): Response<Location>
 
