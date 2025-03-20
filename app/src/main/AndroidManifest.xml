@@ -18,7 +18,7 @@
         android:theme="@style/Theme.AirAdvise"
         tools:targetApi="31">
         <activity
-            android:name=".AirAdviseApplication"
+            android:name=".activities.ApiTestActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

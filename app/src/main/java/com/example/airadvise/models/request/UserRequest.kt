@@ -1,3 +1,5 @@
+package com.example.airadvise.models.request
+
 data class UpdateUserRequest(
     val name: String,
     val email: String

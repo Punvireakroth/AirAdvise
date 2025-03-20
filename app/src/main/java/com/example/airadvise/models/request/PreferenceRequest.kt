@@ -1,3 +1,5 @@
+package com.example.airadvise.models.request
+
 data class UpdatePreferencesRequest(
     val notification_enabled: Boolean,
     val aqi_threshold: Int,

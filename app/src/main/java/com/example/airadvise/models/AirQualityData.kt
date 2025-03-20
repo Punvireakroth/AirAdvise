@@ -1,3 +1,5 @@
+package com.example.airadvise.models
+
 data class AirQualityData(
     val id: Long,
     val locationId: Long,

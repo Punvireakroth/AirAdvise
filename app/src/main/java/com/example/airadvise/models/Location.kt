@@ -1,3 +1,5 @@
+package com.example.airadvise.models
+
 data class Location(
     val id: Long,
     val cityName: String,

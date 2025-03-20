@@ -1,3 +1,4 @@
+package com.example.airadvise.models.response
 data class PaginatedResponse<T>(
     val data: List<T>,
     val current_page: Int,

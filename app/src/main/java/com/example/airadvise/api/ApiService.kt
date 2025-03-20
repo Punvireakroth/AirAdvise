@@ -1,3 +1,27 @@
+package com.example.airadvise.api
+
+
+import com.example.airadvise.models.Activity
+import com.example.airadvise.models.ActivityRecommendations
+import com.example.airadvise.models.AirQualityData
+import com.example.airadvise.models.AirQualityForecast
+import com.example.airadvise.models.Article
+import com.example.airadvise.models.AuthResponse
+import com.example.airadvise.models.Feedback
+import com.example.airadvise.models.FeedbackResponse
+import com.example.airadvise.models.HealthTip
+import com.example.airadvise.models.Location
+import com.example.airadvise.models.User
+import com.example.airadvise.models.UserNotification
+import com.example.airadvise.models.UserPreferences
+import com.example.airadvise.models.request.ChangePasswordRequest
+import com.example.airadvise.models.request.FeedbackRequest
+import com.example.airadvise.models.request.FeedbackResponseRequest
+import com.example.airadvise.models.request.LoginRequest
+import com.example.airadvise.models.request.RegisterRequest
+import com.example.airadvise.models.response.LocationSearchResponse
+import com.example.airadvise.models.response.MessageResponse
+import com.example.airadvise.models.response.PaginatedResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
