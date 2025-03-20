@@ -1,3 +1,4 @@
+package com.example.airadvise.models
 data class Feedback(
     val id: Long,
     val userId: Long,

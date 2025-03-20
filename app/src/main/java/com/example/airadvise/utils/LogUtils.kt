@@ -1,3 +1,5 @@
+package com.example.airadvise.utils
+import android.util.Log
 import com.github.mikephil.charting.BuildConfig
 
 object LogUtils {

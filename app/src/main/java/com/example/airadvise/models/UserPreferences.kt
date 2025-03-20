@@ -1,3 +1,5 @@
+package com.example.airadvise.models
+
 data class UserPreferences(
     val id: Long,
     val userId: Long,

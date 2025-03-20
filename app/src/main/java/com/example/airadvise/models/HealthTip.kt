@@ -1,3 +1,5 @@
+package com.example.airadvise.models
+
 data class HealthTip(
     val id: Long,
     val title: String,
