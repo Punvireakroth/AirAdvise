@@ -65,4 +65,7 @@ dependencies {
 
     // Chart library for AQI visualization
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    implementation ("com.facebook.stetho:stetho:1.6.0")
+    implementation ("com.facebook.stetho:stetho-okhttp3:1.6.0")
 }

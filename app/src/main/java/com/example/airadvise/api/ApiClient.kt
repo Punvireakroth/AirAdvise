@@ -2,6 +2,7 @@ package com.example.airadvise.api
 
 import android.content.Context
 import com.example.airadvise.utils.SessionManager
+import com.facebook.stetho.okhttp3.StethoInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,7 +12,7 @@ import java.util.concurrent.TimeUnit
 
 // This is a Retrofit instance
 object ApiClient {
-    private const val BASE_URL = "http://localhost:8000/"
+    private const val BASE_URL = "http://127.0.0.1:8000/"
 
     fun createApiService(context: Context): ApiService {
         val authInterceptor = Interceptor { chain ->
@@ -35,6 +36,7 @@ object ApiClient {
 
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
+            .addNetworkInterceptor(StethoInterceptor())
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
