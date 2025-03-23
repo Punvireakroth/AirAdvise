@@ -1,6 +1,7 @@
 package com.example.airadvise.api
 
 import android.content.Context
+import com.example.airadvise.utils.SessionManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

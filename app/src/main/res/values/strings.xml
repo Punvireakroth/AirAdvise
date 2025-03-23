@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">AirAdvise</string>
+
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="login">Login</string>
+    <string name="dont_have_account">Don\'t have an account</string>
+    <string name="app_logo">Air Advise Logo</string>
+    <string name="feature_coming_soon">Coming soon</string>
+    <string name="email_required">Email is required</string>
+    <string name="password_required">Password is required</string>
+    <string name="invalid_email">Email is invalid</string>
+    <string name="invalid_password">Password is invalid</string>
+
+    <string name="invalid_credentials">Your input is invalid</string>
+    <string name="network_error">You have network error</string>
+    <string name="login_failed">Your login attempt has been failed, try again later</string>
+
+
 </resources>
