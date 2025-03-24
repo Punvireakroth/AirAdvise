@@ -38,4 +38,19 @@
     <string name="password_strong">Your password look legit 😎</string>
     <string name="password_medium">Your password is good, but you can make it stronger 🔒</string>
     <string name="password_weak">Your password is weak, please make it stronger 🔒</string>
+
+
+    <!-- Menu -->
+    <string name="logout">Logout</string>
+    <!-- Bottom menus -->
+    <string name="home">Home</string>
+    <string name="forecast">Forecast</string>
+    <string name="locations">Location</string>
+    <string name="profile">Profile</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="logout_confirmation">Are you sure you want to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
