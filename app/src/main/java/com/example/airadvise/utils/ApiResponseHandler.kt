@@ -1,3 +1,5 @@
+package com.example.airadvise.utils
+
 import retrofit2.Response
 
 sealed class Resource<T>(

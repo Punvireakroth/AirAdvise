@@ -1,3 +1,57 @@
 <resources>
     <string name="app_name">AirAdvise</string>
+
+
+    <!-- Login screen string -->
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="login">Login</string>
+    <string name="dont_have_account">Don\'t have an account</string>
+    <string name="app_logo">Air Advise Logo</string>
+    <string name="feature_coming_soon">Coming soon</string>
+    <string name="email_required">Email is required</string>
+    <string name="password_required">Password is required</string>
+    <string name="invalid_email">Email is invalid</string>
+    <string name="invalid_password">Password is invalid</string>
+    <string name="invalid_credentials">Your input is invalid</string>
+    <string name="network_error">You have network error</string>
+    <string name="login_failed">Your login attempt has been failed, try again later</string>
+
+    <!-- Register screen string -->
+    <string name="create_account">Create an account</string>
+    <string name="full_name">Full name</string>
+    <string name="password_requirements">Password required</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="agree_to_terms">Term and condition</string>
+    <string name="register">Register</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="name_required">Name is required</string>
+    <string name="password_too_short">Your password is too short</string>
+    <string name="confirm_password_required">Confirm password required</string>
+    <string name="passwords_dont_match">Your password don\'t matched</string>
+    <string name="please_agree_to_terms">Please agree to the terms and conditions</string>
+    <string name="email_already_exists">Email is already registered</string>
+    <string name="validation_error">Please check your input data</string>
+    <string name="registration_failed">Registration failed. Please try again later.</string>
+    <string name="password_strong">Your password look legit 😎</string>
+    <string name="password_medium">Your password is good, but you can make it stronger 🔒</string>
+    <string name="password_weak">Your password is weak, please make it stronger 🔒</string>
+    <string name="registration_successful">Registration successful! Please login with your credentials.</string>
+
+
+    <!-- Menu -->
+    <string name="logout">Logout</string>
+    <!-- Bottom menus -->
+    <string name="home">Home</string>
+    <string name="forecast">Forecast</string>
+    <string name="locations">Location</string>
+    <string name="profile">Profile</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="logout_confirmation">Are you sure you want to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

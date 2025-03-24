@@ -10,4 +10,8 @@
     <color name="aqi_unhealthy">#FF0000</color>
     <color name="aqi_very_unhealthy">#8F3F97</color>
     <color name="aqi_hazardous">#7E0023</color>
+
+    // App colours
+    <color name="colorPrimary">#7E0023</color>
+
 </resources>

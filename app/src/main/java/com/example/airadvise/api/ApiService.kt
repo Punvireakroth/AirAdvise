@@ -33,13 +33,13 @@ import retrofit2.http.Query
 
 interface ApiService {
     // Auth endpoints ---------
-    @POST("auth/register")
+    @POST("api/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 
-    @POST("auth/login")
+    @POST("api/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<AuthResponse>
 
-    @POST("auth/logout")
+    @POST("/logout")
     suspend fun logout(): Response<MessageResponse>
 
     // User endpoints --------
