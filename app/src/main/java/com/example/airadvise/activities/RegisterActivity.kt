@@ -33,6 +33,13 @@ class RegisterActivity: AppCompatActivity() {
         setupToolbar()
         setupClickListeners()
         setupTextWatchers()
+
+        // If user click on I already have an account text, go to LoginActivity
+        binding.tvLogin.setOnClickListener {
+            val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun setupToolbar() {
@@ -117,16 +124,18 @@ class RegisterActivity: AppCompatActivity() {
                 is Resource.Success -> {
                     val authResponse = result.data!!
                     
-                    // Store authentication token and user data
-                    SessionManager.saveAuthToken(this@RegisterActivity, authResponse.token)
-                    SessionManager.saveUserId(this@RegisterActivity, authResponse.user.id)
-                    SessionManager.saveUserData(this@RegisterActivity, authResponse.user)
+                    // Show success message
+                    Toast.makeText(
+                        this@RegisterActivity,
+                        getString(R.string.registration_successful),
+                        Toast.LENGTH_LONG
+                    ).show()
+
                     
-                    // Navigate to MainActivity
-                    val intent = Intent(this@RegisterActivity, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    // Navigate to LoginActivity
+                    val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
                     startActivity(intent)
-                    finish()
+                    finish() // Close current activity (RegisterActivity)
                 }
                 is Resource.Error -> {
                     // Parse error message

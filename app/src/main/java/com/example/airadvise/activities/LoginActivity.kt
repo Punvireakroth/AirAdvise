@@ -15,6 +15,7 @@ import com.example.airadvise.utils.Validator
 import com.example.airadvise.utils.SessionManager
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall
+import com.facebook.stetho.Stetho
 import kotlinx.coroutines.launch
 
 class LoginActivity: AppCompatActivity() {
@@ -22,6 +23,7 @@ class LoginActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Stetho.initializeWithDefaults(this)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

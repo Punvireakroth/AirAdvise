@@ -38,6 +38,7 @@
     <string name="password_strong">Your password look legit 😎</string>
     <string name="password_medium">Your password is good, but you can make it stronger 🔒</string>
     <string name="password_weak">Your password is weak, please make it stronger 🔒</string>
+    <string name="registration_successful">Registration successful! Please login with your credentials.</string>
 
 
     <!-- Menu -->
