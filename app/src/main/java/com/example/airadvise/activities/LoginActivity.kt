@@ -24,6 +24,16 @@ class LoginActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Stetho.initializeWithDefaults(this)
+
+        // Check if the user is already login
+        if (SessionManager.isLoggedIn(this) && SessionManager.getRememberMe(this)) {
+            // If user is already login and has remember me checked redirect to the MainActivity
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+            return
+        }
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
