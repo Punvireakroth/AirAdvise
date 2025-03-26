@@ -54,4 +54,8 @@
     <string name="logout_confirmation">Are you sure you want to logout?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+
+
+    <!-- Location permission -->
+    <string name="location_permission_required">Location permission is needed for air quality data</string>
 </resources>

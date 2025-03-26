@@ -11,6 +11,7 @@ import com.example.airadvise.R
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.ActivityLoginBinding
 import com.example.airadvise.models.request.LoginRequest
+import com.example.airadvise.utils.LoadingStateManager
 import com.example.airadvise.utils.Validator
 import com.example.airadvise.utils.SessionManager
 import com.example.airadvise.utils.Resource
@@ -18,7 +19,7 @@ import com.example.airadvise.utils.safeApiCall
 import com.facebook.stetho.Stetho
 import kotlinx.coroutines.launch
 
-class LoginActivity: AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +66,7 @@ class LoginActivity: AppCompatActivity() {
     private fun performLogin() {
         // Show loading indicator
         binding.progressBar.visibility = View.VISIBLE
+
         binding.btnLogin.isEnabled = false
 
         val email = binding.etEmail.text.toString().trim()
@@ -77,24 +79,26 @@ class LoginActivity: AppCompatActivity() {
         // Use coroutine for network call
         lifecycleScope.launch {
             // Using safeApiCall utility
-            val result = safeApiCall { ApiClient.createApiService(this@LoginActivity).login(loginRequest) }
-            
+            val result =
+                safeApiCall { ApiClient.createApiService(this@LoginActivity).login(loginRequest) }
+
             when (result) {
                 is Resource.Success -> {
                     val authResponse = result.data!!
-                    
+
                     // Store authentication token and user data
                     SessionManager.saveAuthToken(this@LoginActivity, authResponse.token)
                     SessionManager.saveUserId(this@LoginActivity, authResponse.user.id)
                     SessionManager.saveUserData(this@LoginActivity, authResponse.user)
                     SessionManager.setRememberMe(this@LoginActivity, rememberMe)
-                    
+
                     // Navigate to MainActivity
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()
                 }
+
                 is Resource.Error -> {
                     // Parse error message
                     val errorMessage = when {
@@ -104,11 +108,12 @@ class LoginActivity: AppCompatActivity() {
                     }
                     Toast.makeText(this@LoginActivity, errorMessage, Toast.LENGTH_LONG).show()
                 }
+
                 is Resource.Loading -> {
                     // This state isn't used in the current implementation
                 }
             }
-            
+
             // Hide loading indicator
             binding.progressBar.visibility = View.GONE
             binding.btnLogin.isEnabled = true

@@ -12,9 +12,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.airadvise.activities.LoginActivity
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.ActivityMainBinding
+import com.example.airadvise.utils.LocationPermissionManager
 import com.example.airadvise.utils.SessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import android.provider.Settings
+import android.net.Uri
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -27,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         setupNavigation()
         setupLogout()
+        checkLocationPermissions()
     }
 
     private fun setupNavigation() {
@@ -113,6 +118,42 @@ class MainActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    private fun checkLocationPermissions() {
+        val locationPermissionManager = LocationPermissionManager(this)
+        locationPermissionManager.checkAndRequestPermissions()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        val locationPermissionManager = LocationPermissionManager(this)
+
+        val handled = locationPermissionManager.handlePermissionResult(
+            requestCode,
+            permissions,
+            grantResults
+        )
+
+        if (!handled) {
+            // Handle the case where the user denied the permission
+            showPermissionDeniedMessage()
+        }
+    }
+
+    // Show a message to the user that the location permission is required
+    private fun showPermissionDeniedMessage() {
+        Snackbar.make(
+            binding.root,
+            getString(R.string.location_permission_required),
+            Snackbar.LENGTH_LONG
+        ).setAction("Settings") {
+            // Open app settings to enable location permission
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = Uri.fromParts("package", packageName, null)
+            startActivity(intent)
+        }.show()
     }
     
     // Handle back button to prevent accidental app exit
