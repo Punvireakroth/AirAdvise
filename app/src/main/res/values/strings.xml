@@ -58,4 +58,46 @@
 
     <!-- Location permission -->
     <string name="location_permission_required">Location permission is needed for air quality data</string>
+
+    <!-- AQI Categories -->
+    <string name="aqi_good">Good</string>
+    <string name="aqi_moderate">Moderate</string>
+    <string name="aqi_unhealthy_sensitive">Unhealthy for Sensitive Groups</string>
+    <string name="aqi_unhealthy">Unhealthy</string>
+    <string name="aqi_very_unhealthy">Very Unhealthy</string>
+    <string name="aqi_hazardous">Hazardous</string>
+
+    <!-- AQI Health Implications -->
+    <string name="aqi_good_implications">Air quality is considered satisfactory, and air pollution poses little or no risk.</string>
+    <string name="aqi_moderate_implications">Air quality is acceptable; however, for some pollutants, there may be moderate health concern for a small number of people.</string>
+    <string name="aqi_unhealthy_sensitive_implications">Members of sensitive groups may experience health effects. The general public is not likely to be affected.</string>
+    <string name="aqi_unhealthy_implications">Everyone may begin to experience health effects; members of sensitive groups may experience more serious health effects.</string>
+    <string name="aqi_very_unhealthy_implications">Health warnings of emergency conditions. The entire population is more likely to be affected.</string>
+    <string name="aqi_hazardous_implications">Health alert: everyone may experience more serious health effects.</string>
+
+    <!-- AQI Precautions -->
+    <string name="aqi_good_precautions">It\'s a great day to be active outside.</string>
+    <string name="aqi_moderate_precautions">Unusually sensitive people should consider reducing prolonged or heavy outdoor exertion.</string>
+    <string name="aqi_unhealthy_sensitive_precautions">People with heart or lung disease, older adults, and children should reduce prolonged or heavy exertion.</string>
+    <string name="aqi_unhealthy_precautions">People with heart or lung disease, older adults, and children should avoid prolonged or heavy exertion. Everyone else should reduce prolonged or heavy exertion.</string>
+    <string name="aqi_very_unhealthy_precautions">People with heart or lung disease, older adults, and children should avoid all physical activity outdoors. Everyone else should avoid prolonged or heavy exertion.</string>
+    <string name="aqi_hazardous_precautions">Everyone should avoid all physical activity outdoors.</string>
+
+    <!-- Layout air quality details -->
+    <string name="updated_time_placeholder">Updated: Just now</string>
+    <string name="pollutants">Pollutants</string>
+
+    <!-- Dialog pollutant details -->
+    <string name="description">Description</string>
+    <string name="health_impact">Health Impact</string>
+
+    <!-- Pollutant Health Impacts -->
+    <string name="pm25_health_impact">Fine particulate matter (PM2.5) can penetrate deep into the lungs and bloodstream, causing respiratory and cardiovascular disease. It can worsen asthma and increase the risk of heart attacks.</string>
+    <string name="pm10_health_impact">Coarse particulate matter (PM10) can irritate airways, aggravate asthma, and contribute to bronchitis and other lung diseases.</string>
+    <string name="o3_health_impact">Ozone (O₃) can trigger inflammation of airways, reduce lung function, and worsen asthma. Prolonged exposure can lead to permanent lung damage.</string>
+    <string name="no2_health_impact">Nitrogen dioxide (NO₂) irritates the respiratory system, reduces lung function, and may contribute to asthma development and respiratory infections.</string>
+    <string name="so2_health_impact">Sulfur dioxide (SO₂) irritates airways, aggravates asthma, and makes breathing difficult. It may worsen existing heart and lung diseases.</string>
+    <string name="co_health_impact">Carbon monoxide (CO) reduces the blood\'s oxygen-carrying capacity, leading to headaches, dizziness, confusion, and at high concentrations, death.</string>
+    <string name="general_pollutant_impact">This pollutant can affect respiratory and cardiovascular health, especially in sensitive individuals.</string>
+
 </resources>
