@@ -58,6 +58,10 @@
 
     <!-- Location permission -->
     <string name="location_permission_required">Location permission is needed for air quality data</string>
+    <string name="error_unknown">Error Unknown</string>
+    <string name="location_not_found">Location not found</string>
+    <string name="location_error">Location error</string>
+    <string name="updated_at">Updated at</string>
 
     <!-- AQI Categories -->
     <string name="aqi_good">Good</string>
@@ -92,12 +96,21 @@
     <string name="health_impact">Health Impact</string>
 
     <!-- Pollutant Health Impacts -->
-    <string name="pm25_health_impact">Fine particulate matter (PM2.5) can penetrate deep into the lungs and bloodstream, causing respiratory and cardiovascular disease. It can worsen asthma and increase the risk of heart attacks.</string>
-    <string name="pm10_health_impact">Coarse particulate matter (PM10) can irritate airways, aggravate asthma, and contribute to bronchitis and other lung diseases.</string>
-    <string name="o3_health_impact">Ozone (O₃) can trigger inflammation of airways, reduce lung function, and worsen asthma. Prolonged exposure can lead to permanent lung damage.</string>
-    <string name="no2_health_impact">Nitrogen dioxide (NO₂) irritates the respiratory system, reduces lung function, and may contribute to asthma development and respiratory infections.</string>
-    <string name="so2_health_impact">Sulfur dioxide (SO₂) irritates airways, aggravates asthma, and makes breathing difficult. It may worsen existing heart and lung diseases.</string>
-    <string name="co_health_impact">Carbon monoxide (CO) reduces the blood\'s oxygen-carrying capacity, leading to headaches, dizziness, confusion, and at high concentrations, death.</string>
-    <string name="general_pollutant_impact">This pollutant can affect respiratory and cardiovascular health, especially in sensitive individuals.</string>
+    <string name="pm25_health_impact">Fine particulate matter (PM2.5) can penetrate deep into the lungs and bloodstream, causing respiratory and cardiovascular disease. It can worsen asthma, reduce lung function, and increase the risk of heart attacks.</string>
+    <string name="pm10_health_impact">Coarse particulate matter (PM10) can cause respiratory issues, aggravate asthma, and contribute to bronchitis and other lung diseases. It\'s especially harmful to children and the elderly.</string>
+    <string name="o3_health_impact">Ozone (O3) can cause inflammation of the airways, reduce lung function, and worsen asthma. Prolonged exposure can lead to permanent lung damage.</string>
+    <string name="no2_health_impact">Nitrogen dioxide (NO2) can irritate the respiratory system, reduce lung function, and increase susceptibility to respiratory infections. Long-term exposure may contribute to asthma development.</string>
+    <string name="so2_health_impact">Sulfur dioxide (SO2) can cause respiratory irritation, aggravate asthma, and make breathing difficult. It may worsen existing heart and lung diseases.</string>
+    <string name="co_health_impact">Carbon monoxide (CO) reduces the blood\'s ability to carry oxygen, leading to reduced oxygen delivery to vital organs. High levels can cause headaches, dizziness, confusion, and even death.</string>
+    <string name="general_pollutant_impact">This pollutant can have negative effects on respiratory and cardiovascular health, especially in sensitive individuals such as children, the elderly, and those with pre-existing conditions.</string>
+
+    <!-- Other UI Strings -->
+    <string name="learn_more">Learn More</string>
+    <string name="coming_soon_educational_content">Detailed educational content coming soon!</string>
+    <string name="pollutant_detail_format">Value: %1$s %2$s\n\n%3$s</string>
+
+
+    <!-- App Error -->
+    <string name="unknown_error">Unknown error</string>
 
 </resources>

@@ -1,95 +1,100 @@
-     <androidx.constraintlayout.widget.ConstraintLayout
-         xmlns:android="http://schemas.android.com/apk/res/android"
-         xmlns:app="http://schemas.android.com/apk/res-auto"
-         android:layout_width="match_parent"
-         android:layout_height="match_parent">
-         
-         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-             android:id="@+id/swipeRefresh"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
-             
-             <androidx.core.widget.NestedScrollView
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent">
-                 
-                 <LinearLayout
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:orientation="vertical"
-                     android:padding="16dp">
-                     
-                     <!-- Welcome message -->
-                     <TextView
-                         android:id="@+id/tvWelcome"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:textSize="20sp"
-                         android:textStyle="bold"
-                         android:layout_marginBottom="16dp"/>
-                     
-                     <!-- Current Location Card -->
-                     <androidx.cardview.widget.CardView
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:layout_marginBottom="16dp"
-                         app:cardCornerRadius="8dp"
-                         app:cardElevation="4dp">
-                         
-                         <LinearLayout
-                             android:layout_width="match_parent"
-                             android:layout_height="wrap_content"
-                             android:orientation="vertical"
-                             android:padding="16dp">
-                             
-                             <TextView
-                                 android:id="@+id/tvLocationName"
-                                 android:layout_width="match_parent"
-                                 android:layout_height="wrap_content"
-                                 android:textSize="18sp"
-                                 android:textStyle="bold"/>
-                                 
-                             <!-- Other location info -->
-                         </LinearLayout>
-                     </androidx.cardview.widget.CardView>
-                     
-                     <!-- Current AQI Card -->
-                     <androidx.cardview.widget.CardView
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:layout_marginBottom="16dp"
-                         app:cardCornerRadius="8dp"
-                         app:cardElevation="4dp">
-                         
-                         <!-- AQI content -->
-                         <!-- We'll add more details in Phase 4 -->
-                     </androidx.cardview.widget.CardView>
-                     
-                     <!-- Quick Tips Section -->
-                     <TextView
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:text="Quick Tips"
-                         android:textSize="18sp"
-                         android:textStyle="bold"
-                         android:layout_marginTop="8dp"
-                         android:layout_marginBottom="8dp"/>
-                     
-                     <!-- Placeholder for tips -->
-                     
-                 </LinearLayout>
-             </androidx.core.widget.NestedScrollView>
-         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-         
-         <!-- Empty state view -->
-         <include
-             android:id="@+id/emptyState"
-             layout="@layout/layout_empty_state"
-             android:visibility="gone"/>
-             
-         <!-- Error state view -->
-         <include
-             android:id="@+id/errorState"
-             layout="@layout/layout_error_state"
-             android:visibility="gone"/>
-     </androidx.constraintlayout.widget.ConstraintLayout>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/contentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <!-- User welcome message -->
+                <TextView
+                    android:id="@+id/tvUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textSize="18sp" />
+
+                <!-- Location info -->
+                <TextView
+                    android:id="@+id/tvLocationName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:textSize="16sp" />
+
+                <!-- Air Quality Details -->
+                <include
+                    android:id="@+id/airQualityDetails"
+                    layout="@layout/layout_air_quality_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Loading State -->
+    <FrameLayout
+        android:id="@+id/loadingState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <!-- Error State -->
+    <LinearLayout
+        android:id="@+id/errorState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:contentDescription="Error icon"
+            android:src="@drawable/ic_error" />
+
+        <TextView
+            android:id="@+id/tvErrorMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Retry" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

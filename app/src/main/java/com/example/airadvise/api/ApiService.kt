@@ -19,6 +19,8 @@ import com.example.airadvise.models.request.FeedbackRequest
 import com.example.airadvise.models.request.FeedbackResponseRequest
 import com.example.airadvise.models.request.LoginRequest
 import com.example.airadvise.models.request.RegisterRequest
+//import com.example.airadvise.models.response.AirQualityResponse
+import com.example.airadvise.models.response.AirQualityResponseData
 import com.example.airadvise.models.response.LocationSearchResponse
 import com.example.airadvise.models.response.MessageResponse
 import com.example.airadvise.models.response.PaginatedResponse
@@ -71,11 +73,17 @@ interface ApiService {
     suspend fun searchLocations(@Query("query") query: String): Response<LocationSearchResponse>
 
     // Air quality --------
-    @GET("air-quality")
-    suspend fun getAirQuality(
+//    @GET("air-quality")
+//    suspend fun getAirQuality(
+//        @Query("latitude") latitude: Double,
+//        @Query("longitude") longitude: Double
+//    ): Response<AirQualityData>
+
+    @GET("api/air-quality/current")
+    suspend fun getCurrentAirQuality(
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double
-    ): Response<AirQualityData>
+    ): Response<AirQualityResponseData>
 
     @GET("locations/{id}/air-quality")
     suspend fun getAirQualityByLocation(@Path("id") locationId: Long): Response<AirQualityData>
