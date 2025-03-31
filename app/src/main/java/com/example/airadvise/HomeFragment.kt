@@ -29,6 +29,7 @@ import com.example.airadvise.utils.AirQualityCache
 import com.example.airadvise.utils.LocationProvider
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale.*
@@ -45,6 +46,8 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private var isLoading = false
+    private var locationUpdateJob: Job? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -86,6 +89,18 @@ class HomeFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (hasLocationPermission()) {
+            startLocationUpdates()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
     private fun hasLocationPermission(): Boolean {
         return return ContextCompat.checkSelfPermission(
             requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
@@ -102,6 +117,7 @@ class HomeFragment : Fragment() {
                 val location = locationProvider.getLastLocation()
 
                 if (location != null) {
+                    binding.swipeRefresh.isRefreshing = false
                     fetchAirQualityData(location.latitude, location.longitude)
                 } else {
                     setupErrorState(getString(R.string.location_not_found))
@@ -124,6 +140,7 @@ class HomeFragment : Fragment() {
 
                 when (response) {
                     is Resource.Success -> {
+                        binding.swipeRefresh.isRefreshing = false
                         val airQualityData = response.data!!.airQualityData
                         displayAirQualityData(airQualityData)
 
@@ -244,10 +261,9 @@ class HomeFragment : Fragment() {
                 }
 
                 if (response is Resource.Success && response.data != null) {
-                    val airQualityData = response.data.airQualityData
-                    // Attach the location to the air quality data
+                    binding.swipeRefresh.isRefreshing = false
 
-                    // Now you can pass just the airQualityData to cache
+                    val airQualityData = response.data.airQualityData
                     AirQualityCache.saveAirQualityDataWithLocation(
                         requireContext(),
                         airQualityData
@@ -307,6 +323,27 @@ class HomeFragment : Fragment() {
         ).show()
     }
 
+    private fun startLocationUpdates() {
+        // Cancel existing job if any
+        locationUpdateJob?.cancel()
+
+        if (!hasLocationPermission()) return
+
+        locationUpdateJob = lifecycleScope.launch {
+            try {
+                locationProvider.getLocationUpdates(30000) // Updates every 30 seconds
+                    .collect { location ->
+                        // Only refresh if not already refreshing and we detect significant movement
+                        if (!isLoading && !binding.swipeRefresh.isRefreshing) {
+                            fetchAirQualityData(location.latitude, location.longitude)
+                        }
+                    }
+            } catch (e: Exception) {
+                Log.e("HomeFragment", "Location updates error: ${e.message}")
+            }
+        }
+    }
+
     // Loading and error state
     private fun setUpLoadingState() {
         binding.loadingState.visibility = View.VISIBLE
@@ -349,11 +386,46 @@ class HomeFragment : Fragment() {
         binding.swipeRefresh.isRefreshing = false
         isLoading = false
 
-        // Show error message
-        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+        // Try to use cached data first if available
+        val cachedData = AirQualityCache.getCachedAirQualityData(requireContext())
+        if (cachedData != null) {
+            // We have cached data, so just show a toast with the error
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+
+            // Display the cached data
+            val airQualityData = cachedData
+            displayAirQualityData(airQualityData)
+            binding.contentContainer.visibility = View.VISIBLE
+        } else {
+            // No cached data, show the error state
+            binding.contentContainer.visibility = View.GONE
+
+            // Show the error layout
+            val errorView = binding.errorState
+            errorView.visibility = View.VISIBLE
+            errorView.findViewById<TextView>(R.id.tvErrorMessage).text = errorMessage
+
+            // Setup retry button
+            errorView.findViewById<Button>(R.id.btnRetry).setOnClickListener {
+                errorView.visibility = View.GONE
+                if (hasLocationPermission()) {
+                    getCurrentLocation()
+                } else {
+                    // Still need location permission
+                    handleError(getString(R.string.location_permission_required))
+                }
+            }
+        }
+    }
+
+
+    private fun stopLocationUpdates() {
+        locationUpdateJob?.cancel()
+        locationUpdateJob = null
     }
 
     override fun onDestroyView() {
+        stopLocationUpdates()
         super.onDestroyView()
         _binding = null
     }
