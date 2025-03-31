@@ -80,7 +80,9 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             // Using safeApiCall utility
             val result =
-                safeApiCall { ApiClient.createApiService(this@LoginActivity).login(loginRequest) }
+                safeApiCall {
+                    ApiClient.createApiService(this@LoginActivity).login(loginRequest)
+                }
 
             when (result) {
                 is Resource.Success -> {

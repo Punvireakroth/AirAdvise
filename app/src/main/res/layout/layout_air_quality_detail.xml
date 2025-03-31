@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+    
+    <com.example.airadvise.views.AQIGaugeView
+        android:id="@+id/aqiGaugeView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginBottom="16dp"/>
+    
+    <TextView
+        android:id="@+id/tvUpdatedTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/updated_time_placeholder"
+        android:textSize="12sp"
+        android:layout_marginBottom="16dp"/>
+    
+    <TextView
+        android:id="@+id/tvHealthImplications"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:textSize="14sp"/>
+    
+    <TextView
+        android:id="@+id/tvPrecautions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:textSize="14sp"
+        android:textStyle="italic"/>
+    
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pollutants"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPollutants"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</LinearLayout> 

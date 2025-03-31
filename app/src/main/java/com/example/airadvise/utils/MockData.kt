@@ -11,7 +11,7 @@ import com.example.airadvise.models.Location
 import com.example.airadvise.models.User
 import com.example.airadvise.models.UserNotification
 import com.example.airadvise.models.UserPreferences
-import com.example.airadvise.models.response.AirQualityResponse
+//import com.example.airadvise.models.response.AirQualityResponse
 import com.example.airadvise.models.response.ErrorResponse
 import com.example.airadvise.models.response.LocationSearchResponse
 import com.example.airadvise.models.response.MessageResponse
@@ -422,22 +422,22 @@ object MockData {
         )
     }
 
-    fun getMockAirQualityResponse(): AirQualityResponse {
-        return AirQualityResponse(
-            airQuality = getMockAirQualityData(),
-            location = getMockLocation(),
-            healthTips = getMockHealthTips().filter {
-                val aqi = getMockAirQualityData().aqi
-                it.minAqi <= aqi && it.maxAqi >= aqi
-            },
-            safeActivities = getMockActivities().filter {
-                it.maxSafeAqi >= getMockAirQualityData().aqi
-            },
-            unsafeActivities = getMockActivities().filter {
-                it.maxSafeAqi < getMockAirQualityData().aqi
-            }
-        )
-    }
+//    fun getMockAirQualityResponse(): AirQualityResponse {
+//        return AirQualityResponse(
+//            airQuality = getMockAirQualityData(),
+//            location = getMockLocation(),
+//            healthTips = getMockHealthTips().filter {
+//                val aqi = getMockAirQualityData().aqi
+//                it.minAqi <= aqi && it.maxAqi >= aqi
+//            },
+//            safeActivities = getMockActivities().filter {
+//                it.maxSafeAqi >= getMockAirQualityData().aqi
+//            },
+//            unsafeActivities = getMockActivities().filter {
+//                it.maxSafeAqi < getMockAirQualityData().aqi
+//            }
+//        )
+//    }
 
     fun getMockLocationSearchResponse(): LocationSearchResponse {
         return LocationSearchResponse(

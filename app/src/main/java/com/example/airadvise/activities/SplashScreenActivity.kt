@@ -15,7 +15,7 @@ class SplashScreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_splash_screeen)
+        setContentView(R.layout.activity_splash_screen)
         lifecycleScope.launch {
             delay(1500)
             if (SessionManager.isLoggedIn(this@SplashScreenActivity)) {
