@@ -14,7 +14,7 @@ data class AirQualityData(
     val source: String,
     val timestamp: String,
     val createdAt: String? = null,
-    val updatedAt: String? = null
+    val updatedAt: String? = null,
 ) {
     // Extract the pollutants values
     fun getPollutants(): List<Pollutant> {
