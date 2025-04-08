@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/air_advice_logo_transparent_xs" />
+        app:srcCompat="@drawable/air_advice" />
 
     <TextView
         android:id="@+id/textView"
