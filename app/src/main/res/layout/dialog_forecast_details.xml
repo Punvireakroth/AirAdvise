@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvDetailDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Monday, October 10" />
+
+    <TextView
+        android:id="@+id/tvDetailAqi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDetailDate"
+        tools:text="53" />
+
+    <TextView
+        android:id="@+id/tvDetailAqiLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="AQI"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvDetailAqi"
+        app:layout_constraintStart_toEndOf="@id/tvDetailAqi"
+        app:layout_constraintTop_toTopOf="@id/tvDetailAqi" />
+
+    <TextView
+        android:id="@+id/tvDetailCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_category_background"
+        android:paddingStart="12dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="4dp"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDetailAqi"
+        tools:backgroundTint="#FDD74B"
+        tools:text="Moderate" />
+
+    <TextView
+        android:id="@+id/tvDetailDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDetailCategory"
+        tools:text="Air quality is acceptable; however, some pollutants may be a concern for a small number of people who are sensitive to air pollution." />
+
+    <TextView
+        android:id="@+id/tvPollutantsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Pollutant Levels"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDetailDescription" />
+
+    <TableLayout
+        android:id="@+id/pollutantsTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPollutantsTitle">
+
+        <TableRow android:padding="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="PM2.5"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvDetailPm25"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="12.5 μg/m³" />
+        </TableRow>
+
+        <TableRow android:padding="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="PM10"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvDetailPm10"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="25.3 μg/m³" />
+        </TableRow>
+
+        <TableRow android:padding="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ozone (O₃)"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvDetailO3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="40.2 ppb" />
+        </TableRow>
+
+        <TableRow android:padding="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nitrogen Dioxide (NO₂)"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvDetailNo2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="15.7 ppb" />
+        </TableRow>
+
+        <TableRow android:padding="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sulfur Dioxide (SO₂)"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvDetailSo2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="2.3 ppb" />
+        </TableRow>
+
+        <TableRow android:padding="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Carbon Monoxide (CO)"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvDetailCo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="0.4 ppm" />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/tvRecommendationTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Recommendations"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pollutantsTable" />
+
+    <TextView
+        android:id="@+id/tvDetailRecommendation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvRecommendationTitle"
+        tools:text="Consider reducing prolonged or heavy exertion. It's OK to be active outside, but take more breaks and do less intense activities. Watch for symptoms such as coughing or shortness of breath." />
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Close"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDetailRecommendation" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
