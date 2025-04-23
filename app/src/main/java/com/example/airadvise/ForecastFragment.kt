@@ -21,6 +21,7 @@ import com.example.airadvise.R
 import com.example.airadvise.adapters.ForecastAdapter
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.DialogForecastDetailsBinding
+import com.example.airadvise.databinding.DialogLocationSelectionBinding
 import com.example.airadvise.databinding.FragmentForecastBinding
 import com.example.airadvise.models.AirQualityForecast
 import com.example.airadvise.utils.safeApiCall
@@ -249,7 +250,7 @@ class ForecastFragment : Fragment() {
                     
                     when (response) {
                         is Resource.Success -> {
-                            val locationId = response.data?.location?.id ?: 0
+                            val locationId = response.data?.airQualityData?.locationId ?: 1
                             val forecastResponse = safeApiCall {
                                 ApiClient.createApiService(requireContext())
                                     .getForecasts(locationId)
@@ -316,7 +317,7 @@ class ForecastFragment : Fragment() {
         updateChart()
 
         // Update location button text
-        val locationText = selectedLocation?.name ?: "Current Location"
+        val locationText = selectedLocation?.cityName ?: "Current Location"
         binding.btnSelectLocation.text = locationText
     }
 
@@ -426,9 +427,9 @@ class ForecastFragment : Fragment() {
         // Add saved locations to radio group
         savedLocations.forEach { location ->
             val radioButton = android.widget.RadioButton(context).apply {
-                text = location.name
-                id = View.generateViewId() // Generate a unique ID
-                tag = location.id // Store location ID as tag
+                text = location.cityName
+                id = View.generateViewId()
+                tag = location.id
             }
             dialogBinding.rgLocationOptions.addView(radioButton)
         }
