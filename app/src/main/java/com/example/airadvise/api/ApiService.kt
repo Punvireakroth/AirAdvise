@@ -21,6 +21,7 @@ import com.example.airadvise.models.request.LoginRequest
 import com.example.airadvise.models.request.RegisterRequest
 //import com.example.airadvise.models.response.AirQualityResponse
 import com.example.airadvise.models.response.AirQualityResponseData
+import com.example.airadvise.models.response.ForecastResponse
 import com.example.airadvise.models.response.LocationSearchResponse
 import com.example.airadvise.models.response.MessageResponse
 import com.example.airadvise.models.response.PaginatedResponse
@@ -73,11 +74,6 @@ interface ApiService {
     suspend fun searchLocations(@Query("query") query: String): Response<LocationSearchResponse>
 
     // Air quality --------
-//    @GET("air-quality")
-//    suspend fun getAirQuality(
-//        @Query("latitude") latitude: Double,
-//        @Query("longitude") longitude: Double
-//    ): Response<AirQualityData>
 
     @GET("api/air-quality/current")
     suspend fun getCurrentAirQuality(
@@ -89,8 +85,14 @@ interface ApiService {
     suspend fun getAirQualityByLocation(@Path("id") locationId: Long): Response<AirQualityData>
 
     // Forecasts --------
-    @GET("locations/{id}/forecasts")
-    suspend fun getForecasts(@Path("id") locationId: Long): Response<List<AirQualityForecast>>
+    @GET("api/locations/{id}/forecasts")
+    suspend fun getForecasts(@Path("id") locationId: Long): Response<ForecastResponse>
+
+    @GET("api/forecasts/by-location")
+    suspend fun getForecastsByLocation(
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double
+    ): Response<ForecastResponse>
 
     // Health tips --------
     @GET("health-tips")
