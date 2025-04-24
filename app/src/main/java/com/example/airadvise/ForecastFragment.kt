@@ -50,6 +50,7 @@ class ForecastFragment : Fragment() {
     private var selectedLocation: LocationModel? = null
     private var currentPollutantFilter = "AQI"
     private var isLoading = false
+    private var lastKnownLocationId: Long? = null
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
@@ -118,8 +119,6 @@ class ForecastFragment : Fragment() {
             showLocationSelectionDialog()
         }
 
-        // Load saved locations
-        loadSavedLocations()
     }
 
     private fun checkLocationPermission() {
@@ -131,6 +130,7 @@ class ForecastFragment : Fragment() {
                 // Permission already granted
                 getCurrentLocation()
             }
+
             shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
                 // Show explanation why we need location
                 Toast.makeText(
@@ -140,6 +140,7 @@ class ForecastFragment : Fragment() {
                 ).show()
                 requestLocationPermission()
             }
+
             else -> {
                 // No explanation needed, request the permission
                 requestLocationPermission()
@@ -196,32 +197,6 @@ class ForecastFragment : Fragment() {
         }
     }
 
-    private fun loadSavedLocations() {
-        lifecycleScope.launch {
-            try {
-                val response = safeApiCall {
-                    ApiClient.createApiService(requireContext())
-                        .getUserLocations()
-                }
-                
-                when (response) {
-                    is Resource.Success -> {
-                        savedLocations = response.data ?: emptyList()
-                    }
-                    is Resource.Error -> {
-                        // Only log this error, don't show UI error since this is background loading
-                        android.util.Log.e("ForecastFragment", "Failed to load saved locations: ${response.message}")
-                    }
-                    is Resource.Loading -> {
-                        // Do nothing for loading state
-                    }
-                }
-            } catch (e: Exception) {
-                android.util.Log.e("ForecastFragment", "Exception loading saved locations: ${e.message}")
-            }
-        }
-    }
-
     private fun loadForecastData() {
         if (isLoading) return
         
@@ -230,17 +205,27 @@ class ForecastFragment : Fragment() {
         
         lifecycleScope.launch {
             try {
+                android.util.Log.d("ForecastFragment", "Loading forecast. Selected location: $selectedLocation, Current location: $currentLocation")
+                
                 val forecasts = if (selectedLocation != null) {
-                    // Get forecasts for selected location
                     val response = safeApiCall {
                         ApiClient.createApiService(requireContext())
                             .getForecasts(selectedLocation!!.id)
                     }
+                    lastKnownLocationId = selectedLocation!!.id
                     
-                    handleForecastResponse(response)
+                    when (response) {
+                        is Resource.Success -> response.data?.forecasts ?: emptyList()
+                        is Resource.Error -> {
+                            handleError(response.message ?: getString(R.string.unknown_error))
+                            emptyList()
+                        }
+                        is Resource.Loading -> emptyList()
+                    }
                 } else if (currentLocation != null) {
-                    // Get forecasts for current location
-                    val response = safeApiCall {
+                    // For current location, we need to get locationId first from air quality data
+                    // Then use that ID to fetch forecasts
+                    val airQualityResponse = safeApiCall {
                         ApiClient.createApiService(requireContext())
                             .getCurrentAirQuality(
                                 currentLocation!!.latitude,
@@ -248,26 +233,46 @@ class ForecastFragment : Fragment() {
                             )
                     }
                     
-                    when (response) {
+                    when (airQualityResponse) {
                         is Resource.Success -> {
-                            val locationId = response.data?.airQualityData?.locationId ?: 1
+                            val locationId = 1L
+                            
+                            // Now get forecasts using this location ID
                             val forecastResponse = safeApiCall {
                                 ApiClient.createApiService(requireContext())
                                     .getForecasts(locationId)
                             }
-                            handleForecastResponse(forecastResponse)
+                            
+                            when (forecastResponse) {
+                                is Resource.Success -> forecastResponse.data?.forecasts ?: emptyList()
+                                is Resource.Error -> {
+                                    handleError(forecastResponse.message ?: getString(R.string.unknown_error))
+                                    emptyList()
+                                }
+                                is Resource.Loading -> emptyList()
+                            }
                         }
                         is Resource.Error -> {
-                            handleError(response.message ?: getString(R.string.unknown_error))
+                            handleError(airQualityResponse.message ?: getString(R.string.unknown_error))
                             emptyList()
                         }
-                        is Resource.Loading -> {
-                            emptyList()
-                        }
+                        is Resource.Loading -> emptyList()
                     }
                 } else {
-                    // No location available
-                    emptyList()
+                    // use a default location ID
+                    val forecastResponse = safeApiCall {
+                        ApiClient.createApiService(requireContext())
+                            .getForecasts(1L) 
+                    }
+                    
+                    when (forecastResponse) {
+                        is Resource.Success -> forecastResponse.data?.forecasts ?: emptyList()
+                        is Resource.Error -> {
+                            handleError(forecastResponse.message ?: getString(R.string.unknown_error))
+                            emptyList()
+                        }
+                        is Resource.Loading -> emptyList()
+                    }
                 }
                 
                 this@ForecastFragment.forecasts = forecasts
@@ -281,7 +286,9 @@ class ForecastFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 requireActivity().runOnUiThread {
-                    handleError(e.message ?: getString(R.string.unknown_error))
+                    val detailedError = "Error: ${e.javaClass.simpleName} - ${e.message}"
+                    android.util.Log.e("ForecastFragment", detailedError, e)
+                    handleError(detailedError)
                     binding.swipeRefreshLayout.isRefreshing = false
                 }
             }
@@ -295,6 +302,7 @@ class ForecastFragment : Fragment() {
                 handleError(response.message ?: getString(R.string.unknown_error))
                 emptyList()
             }
+
             is Resource.Loading -> emptyList()
         }
     }
@@ -408,7 +416,8 @@ class ForecastFragment : Fragment() {
             tvDetailCo.text = forecast.co?.let { "$it ppm" } ?: "--"
 
             // Set recommendation if available
-            tvDetailRecommendation.text = forecast.recommendation ?: "No specific recommendations available for this day."
+            tvDetailRecommendation.text =
+                forecast.recommendation ?: "No specific recommendations available for this day."
 
             // Close button
             btnClose.setOnClickListener {
@@ -444,7 +453,8 @@ class ForecastFragment : Fragment() {
                 getCurrentLocation()
             } else {
                 // Saved location selected
-                val selectedRadioButton = dialog.findViewById<android.widget.RadioButton>(selectedId)
+                val selectedRadioButton =
+                    dialog.findViewById<android.widget.RadioButton>(selectedId)
                 val locationId = selectedRadioButton.tag as Long
 
                 // Find the selected location
