@@ -278,17 +278,8 @@ class HomeFragment : Fragment() {
             AQIUtils.getHealthImplications(requireContext(), airQualityData.aqi)
         detailsBinding.tvPrecautions.text =
             AQIUtils.getPrecautions(requireContext(), airQualityData.aqi)
-
-        // Setup pollutants recycler view
-        val pollutantAdapter = PollutantAdapter(airQualityData.getPollutants()) { pollutant ->
-            // Handle pollutant click - show details dialog
-            showPollutantDetailsDialog(pollutant)
-        }
-
-        detailsBinding.rvPollutants.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = pollutantAdapter
-        }
+        // Hide recycler view
+        detailsBinding.rvPollutants?.visibility = View.GONE
     }
 
     private fun displayLocationData(location: Location) {
@@ -376,52 +367,6 @@ class HomeFragment : Fragment() {
                 Log.e(TAG, "Background refresh failed: ${e.message}")
             }
         }
-    }
-
-    private fun showPollutantDetailsDialog(pollutant: Pollutant) {
-        val dialogBinding = DialogPollutantDetailsBinding.inflate(layoutInflater)
-
-        dialogBinding.tvPollutantName.text = pollutant.name
-        dialogBinding.tvPollutantValue.text = "${pollutant.value} ${pollutant.unit}"
-        dialogBinding.tvPollutantDescription.text = pollutant.description
-
-        // Set progress based on pollutant index
-        dialogBinding.progressBar.progress = pollutant.index
-
-        // Set color based on index
-        dialogBinding.progressBar.progressTintList = android.content.res.ColorStateList.valueOf(
-            AQIUtils.getAQIColor(requireContext(), pollutant.index)
-        )
-
-        // Set health impact information
-        dialogBinding.tvHealthImpact.text = getHealthImpactForPollutant(pollutant.code)
-
-        // Create and show dialog
-        AlertDialog.Builder(requireContext()).setView(dialogBinding.root)
-            .setPositiveButton(android.R.string.ok, null)
-            .setNegativeButton(R.string.learn_more) { _, _ ->
-                navigateToPollutantEducation(pollutant.code)
-            }.create().show()
-    }
-
-    private fun getHealthImpactForPollutant(pollutantCode: String): String {
-        return when (pollutantCode) {
-            "pm25" -> getString(R.string.pm25_health_impact)
-            "pm10" -> getString(R.string.pm10_health_impact)
-            "o3" -> getString(R.string.o3_health_impact)
-            "no2" -> getString(R.string.no2_health_impact)
-            "so2" -> getString(R.string.so2_health_impact)
-            "co" -> getString(R.string.co_health_impact)
-            else -> getString(R.string.general_pollutant_impact)
-        }
-    }
-
-    private fun navigateToPollutantEducation(pollutantCode: String) {
-        Toast.makeText(
-            requireContext(),
-            getString(R.string.coming_soon_educational_content),
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
     private fun startLocationUpdates() {

@@ -42,7 +42,7 @@
                     layout="@layout/layout_air_quality_detail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" />
+                    />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/bestDayCard"
