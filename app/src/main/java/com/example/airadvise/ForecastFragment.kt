@@ -7,11 +7,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -65,6 +67,7 @@ class ForecastFragment : Fragment() {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -79,6 +82,7 @@ class ForecastFragment : Fragment() {
         checkLocationPermission()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupRecyclerView() {
         forecastAdapter = ForecastAdapter(requireContext(), emptyList()) { forecast ->
             showForecastDetails(forecast)
@@ -90,12 +94,14 @@ class ForecastFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             loadForecastData()
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupPollutantFilters() {
         binding.pollutantFilterChipGroup.setOnCheckedChangeListener { _, checkedId ->
             currentPollutantFilter = when (checkedId) {
@@ -114,6 +120,7 @@ class ForecastFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupLocationSelection() {
         binding.btnSelectLocation.setOnClickListener {
             showLocationSelectionDialog()
@@ -121,6 +128,7 @@ class ForecastFragment : Fragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun checkLocationPermission() {
         when {
             ContextCompat.checkSelfPermission(
@@ -155,6 +163,7 @@ class ForecastFragment : Fragment() {
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -177,6 +186,7 @@ class ForecastFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -197,6 +207,7 @@ class ForecastFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun loadForecastData() {
         if (isLoading) return
         
@@ -307,6 +318,7 @@ class ForecastFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updateUI(forecasts: List<AirQualityForecast>) {
         if (forecasts.isEmpty()) {
             binding.errorView.root.visibility = View.VISIBLE
@@ -329,6 +341,7 @@ class ForecastFragment : Fragment() {
         binding.btnSelectLocation.text = locationText
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updateChart() {
         if (forecasts.isEmpty()) return
 
@@ -395,6 +408,7 @@ class ForecastFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun showForecastDetails(forecast: AirQualityForecast) {
         val dialogBinding = DialogForecastDetailsBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
@@ -428,6 +442,7 @@ class ForecastFragment : Fragment() {
         dialog.show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun showLocationSelectionDialog() {
         val dialogBinding = DialogLocationSelectionBinding.inflate(layoutInflater)
         val dialog = Dialog(requireContext())
