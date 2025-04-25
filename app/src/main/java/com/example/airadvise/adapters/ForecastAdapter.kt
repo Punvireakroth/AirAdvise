@@ -1,9 +1,11 @@
 package com.example.airadvise.adapters
 
 import android.content.Context
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.airadvise.databinding.ItemForecastBinding
 import com.example.airadvise.models.AirQualityForecast
@@ -28,6 +30,7 @@ class ForecastAdapter(
         return ForecastViewHolder(binding)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ForecastViewHolder, position: Int) {
         val forecast = forecasts[position]
         holder.bind(forecast)
@@ -38,6 +41,7 @@ class ForecastAdapter(
     inner class ForecastViewHolder(private val binding: ItemForecastBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        @RequiresApi(Build.VERSION_CODES.O)
         fun bind(forecast: AirQualityForecast) {
             with(binding) {
                 tvDay.text = forecast.getFormattedDate()

@@ -22,7 +22,7 @@
                 android:id="@+id/tvForecastTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="7-Day Forecast"
+                android:text="5-Day Forecast"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
