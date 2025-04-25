@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/airadvise/ForecastFragment.kt
 package com.example.airadvise.fragments
 
 import android.Manifest

@@ -15,4 +15,12 @@
 
     // App colours
     <color name="colorPrimary">#7E0023</color>
+
+    // Chart
+    <color name="chart_good">#A8E05F</color>
+    <color name="chart_moderate">#FDD74B</color>
+    <color name="chart_unhealthy_sensitive">#FB9B57</color>
+    <color name="chart_unhealthy">#F76C5E</color>
+    <color name="chart_very_unhealthy">#A97ABC</color>
+    <color name="chart_hazardous">#A87383</color>
 </resources>
