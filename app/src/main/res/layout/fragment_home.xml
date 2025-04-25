@@ -34,13 +34,74 @@
                     android:paddingEnd="16dp"
                     android:textSize="16sp" />
 
-                <!-- Air Quality Details -->
+                <!-- Best Day Recommendation Section -->
+
                 <include
                     android:id="@+id/airQualityDetails"
                     layout="@layout/layout_air_quality_detail"
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/bestDayCard"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" />
+                    android:layout_margin="16dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
+                    
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        
+                        <TextView
+                            android:id="@+id/tvBestDayTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Best Day for Outdoor Activities"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="8dp"/>
+                            
+                        <LinearLayout
+                            android:id="@+id/bestDayContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            
+                            <TextView
+                                android:id="@+id/tvBestDay"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:textSize="22sp"
+                                android:textStyle="bold"/>
+                                
+                            <TextView
+                                android:id="@+id/tvBestDayAqi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="18sp"
+                                android:layout_marginStart="8dp"
+                                android:padding="4dp"
+                                android:background="@drawable/rounded_bg"
+                                android:textColor="@android:color/white"/>
+                        </LinearLayout>
+                        
+                        <TextView
+                            android:id="@+id/tvBestDayDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textSize="14sp"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

@@ -2,30 +2,36 @@ package com.example.airadvise.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.airadvise.R
-import com.example.airadvise.adapters.PollutantAdapter
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.DialogPollutantDetailsBinding
 import com.example.airadvise.databinding.FragmentHomeBinding
+import com.example.airadvise.models.Activity
 import com.example.airadvise.models.AirQualityData
+import com.example.airadvise.models.AirQualityForecast
 import com.example.airadvise.models.Location
 import com.example.airadvise.models.Pollutant
 import com.example.airadvise.utils.AQIUtils
 import com.example.airadvise.utils.AirQualityCache
+import com.example.airadvise.utils.BestDayRecommendation
 import com.example.airadvise.utils.LocationProvider
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall
@@ -47,6 +53,8 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
     private var isLoading = false
     private var locationUpdateJob: Job? = null
+    private var forecasts: List<AirQualityForecast> = emptyList()
+    private var defaultActivity = Activity(1, "Walking", "low", 90)
 
 
     override fun onCreateView(
@@ -57,10 +65,23 @@ class HomeFragment : Fragment() {
     }
 
     private lateinit var locationProvider: LocationProvider
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         locationProvider = LocationProvider(requireContext())
+
+        val greeting = when (java.time.LocalTime.now().hour) {
+            in 0..11 -> "Good morning"
+            in 12..16 -> "Good afternoon"
+            else -> "Good evening"
+        }
+        binding.tvUsername.text = "$greeting, welcome to AirAdvise"
+
+        // Initialize location name with placeholder
+        binding.tvLocationName.text = "📍 San Francisco"
+
 
         setSwipeRefresh()
 
@@ -84,6 +105,7 @@ class HomeFragment : Fragment() {
         // Check if we have location permission
         if (hasLocationPermission()) {
             getCurrentLocation()
+            fetchForecastData()
         } else {
             handleError(getString(R.string.location_permission_required))
         }
@@ -102,7 +124,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun hasLocationPermission(): Boolean {
-        return return ContextCompat.checkSelfPermission(
+        return ContextCompat.checkSelfPermission(
             requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
             requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION
@@ -144,10 +166,8 @@ class HomeFragment : Fragment() {
                         val airQualityData = response.data!!.airQualityData
                         displayAirQualityData(airQualityData)
 
-                        // TODO: Handle these data in the future tasks phases
-                        // response.data.safeActivities
-                        // response.data.unsafeActivities
-                        // response.data.healthTips
+                        // Fetch forecast data after getting current air quality
+                        fetchForecastData()
 
                         setupContentState()
                     }
@@ -166,6 +186,181 @@ class HomeFragment : Fragment() {
         }
     }
 
+
+private fun fetchForecastData() {
+    lifecycleScope.launch {
+        try {
+            // Always initialize with a valid ID (1 is your default)
+            var locationId = 1L
+            
+            val location = locationProvider.getLastLocation()
+            if (location != null) {
+                try {
+                    val airQualityResponse = safeApiCall {
+                        ApiClient.createApiService(requireContext())
+                            .getCurrentAirQuality(
+                                location.latitude,
+                                location.longitude
+                            )
+                    }
+                    
+                    if (airQualityResponse is Resource.Success) {
+                        val responseLocationId = airQualityResponse.data?.airQualityData?.locationId ?: 1L
+                        locationId = if (responseLocationId > 0) responseLocationId else 1L
+                        
+                        Log.d(TAG, "Got locationId from API: $responseLocationId, using: $locationId")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error getting location ID: ${e.message}")
+                }
+            }
+            
+            if (locationId <= 0) {
+                locationId = 1L
+                Log.w(TAG, "Invalid locationId detected, forcing to default: $locationId")
+            }
+            
+            Log.d(TAG, "Fetching forecasts with locationId: $locationId")
+            
+            // Get forecasts using this location ID
+            val response = safeApiCall {
+                ApiClient.createApiService(requireContext())
+                    .getForecasts(locationId)
+            }
+            
+            // Rest of the code remains the same
+            when (response) {
+                is Resource.Success -> {
+                    forecasts = response.data?.forecasts ?: emptyList()
+                    val bestDayFromApi = response.data?.bestDay
+                    
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        if (bestDayFromApi != null) {
+                            updateBestDayRecommendation(bestDayFromApi)
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e(TAG, "Error fetching forecast: ${response.message}")
+                }
+                is Resource.Loading -> {}
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception fetching forecast: ${e.message}")
+        }
+    }
+}
+
+// Add this overloaded method that takes a bestDay parameter
+@RequiresApi(Build.VERSION_CODES.O)
+private fun updateBestDayRecommendation(bestDay: AirQualityForecast) {
+    binding.bestDayCard.visibility = View.VISIBLE
+    
+    // Set best day details
+    binding.tvBestDay.text = bestDay.getFormattedDate()
+    binding.tvBestDayAqi.text = "AQI: ${bestDay.aqi}"
+    
+    // Set color based on AQI
+    binding.tvBestDayAqi.backgroundTintList = android.content.res.ColorStateList.valueOf(
+        bestDay.getCategoryColor()
+    )
+    
+    // Set description
+    binding.tvBestDayDescription.text = bestDay.description ?: "Best day for outdoor activities."
+    
+    // Make the best day card clickable to show details
+    binding.bestDayCard.setOnClickListener {
+        showBestDayDetailsDialog(bestDay)
+    }
+}
+
+// Create a dialog to show detailed information
+private fun showBestDayDetailsDialog(bestDay: AirQualityForecast) {
+    val dialogBuilder = AlertDialog.Builder(requireContext())
+    val dialogView = layoutInflater.inflate(R.layout.dialog_best_day_details, null)
+    dialogBuilder.setView(dialogView)
+    
+    // Basic info
+    val tvDialogDate = dialogView.findViewById<TextView>(R.id.tvDialogDate)
+    val tvDialogAqi = dialogView.findViewById<TextView>(R.id.tvDialogAqi)
+    val tvDialogCategory = dialogView.findViewById<TextView>(R.id.tvDialogCategory)
+    val tvDialogDescription = dialogView.findViewById<TextView>(R.id.tvDialogDescription)
+    val tvDialogRecommendation = dialogView.findViewById<TextView>(R.id.tvDialogRecommendation)
+    
+    // Pollutant values
+    val tvPM25Value = dialogView.findViewById<TextView>(R.id.tvPM25Value)
+    val tvPM10Value = dialogView.findViewById<TextView>(R.id.tvPM10Value)
+    val tvO3Value = dialogView.findViewById<TextView>(R.id.tvO3Value)
+    val tvNO2Value = dialogView.findViewById<TextView>(R.id.tvNO2Value)
+    val tvSO2Value = dialogView.findViewById<TextView>(R.id.tvSO2Value)
+    val tvCOValue = dialogView.findViewById<TextView>(R.id.tvCOValue)
+    
+    val llActivitiesList = dialogView.findViewById<LinearLayout>(R.id.llActivitiesList)
+    
+    // Set values
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        tvDialogDate.text = bestDay.getFormattedDate()
+    } else {
+        tvDialogDate.text = bestDay.forecastDate ?: "Unknown date"
+    }
+    
+    tvDialogAqi.text = "AQI: ${bestDay.aqi}"
+    tvDialogAqi.backgroundTintList = android.content.res.ColorStateList.valueOf(
+        bestDay.getCategoryColor()
+    )
+    
+    tvDialogCategory.text = bestDay.category
+    tvDialogDescription.text = bestDay.description
+    tvDialogRecommendation.text = bestDay.recommendation
+    
+    // Set pollutant values
+    tvPM25Value.text = "${bestDay.pm25} μg/m³"
+    tvPM10Value.text = "${bestDay.pm10} μg/m³"
+    tvO3Value.text = "${bestDay.o3} ppb"
+    tvNO2Value.text = "${bestDay.no2} ppm"
+    tvSO2Value.text = "${bestDay.so2} ppm"
+    tvCOValue.text = "${bestDay.co} ppb"
+    
+    // Get activities based on category
+    val recommendedActivities = bestDay.recommendedActivities
+    if (recommendedActivities != null) {
+        // Determine which activity list to show based on category
+        val activityList = when (bestDay.category.lowercase()) {
+            "good" -> recommendedActivities.high ?: recommendedActivities.moderate ?: recommendedActivities.low
+            "moderate" -> recommendedActivities.moderate ?: recommendedActivities.low
+            else -> recommendedActivities.low
+        }
+        
+        // Add activities to the list
+        if (activityList != null && activityList.isNotEmpty()) {
+            dialogView.findViewById<TextView>(R.id.tvRecommendedActivitiesTitle).visibility = View.VISIBLE
+            llActivitiesList.removeAllViews() // Clear any existing views
+            
+            for (activity in activityList) {
+                val activityView = TextView(requireContext()).apply {
+                    text = "• $activity"
+                    setPadding(0, 8, 0, 8)
+                    textSize = 14f
+                }
+                llActivitiesList.addView(activityView)
+            }
+        } else {
+            dialogView.findViewById<TextView>(R.id.tvRecommendedActivitiesTitle).visibility = View.GONE
+        }
+    } else {
+        dialogView.findViewById<TextView>(R.id.tvRecommendedActivitiesTitle).visibility = View.GONE
+    }
+    
+    // Create and show dialog
+    val dialog = dialogBuilder.create()
+    
+    // Add close button action
+    dialogView.findViewById<Button>(R.id.btnDialogClose).setOnClickListener {
+        dialog.dismiss()
+    }
+    
+    dialog.show()
+}
     private fun displayAirQualityData(airQualityData: AirQualityData) {
         val detailsBinding = binding.airQualityDetails
 
@@ -173,25 +368,13 @@ class HomeFragment : Fragment() {
         detailsBinding.aqiGaugeView.setAQI(airQualityData.aqi)
 
         // Set updated time
-        detailsBinding.tvUpdatedTime.text =
-            getString(R.string.updated_at, formatTimestamp(airQualityData.timestamp))
+        detailsBinding.tvUpdatedTime.text = "Updated at ${formatTimestamp(airQualityData.timestamp)}"
 
         // Set health implications and precautions
         detailsBinding.tvHealthImplications.text =
             AQIUtils.getHealthImplications(requireContext(), airQualityData.aqi)
         detailsBinding.tvPrecautions.text =
             AQIUtils.getPrecautions(requireContext(), airQualityData.aqi)
-
-        // Setup pollutants recycler view
-        val pollutantAdapter = PollutantAdapter(airQualityData.getPollutants()) { pollutant ->
-            // Handle pollutant click - show details dialog
-            showPollutantDetailsDialog(pollutant)
-        }
-
-        detailsBinding.rvPollutants.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = pollutantAdapter
-        }
     }
 
     private fun displayLocationData(location: Location) {
@@ -223,6 +406,7 @@ class HomeFragment : Fragment() {
 
                         if (location != null) {
                             fetchAirQualityData(location.latitude, location.longitude)
+                            fetchForecastData() // Also refresh forecast data
                         } else {
                             binding.swipeRefresh.isRefreshing = false
                             Toast.makeText(
@@ -270,57 +454,14 @@ class HomeFragment : Fragment() {
                     )
 
                     displayAirQualityData(airQualityData)
+
+                    // Also refresh forecast data
+                    fetchForecastData()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Background refresh failed: ${e.message}")
             }
         }
-    }
-
-    private fun showPollutantDetailsDialog(pollutant: Pollutant) {
-        val dialogBinding = DialogPollutantDetailsBinding.inflate(layoutInflater)
-
-        dialogBinding.tvPollutantName.text = pollutant.name
-        dialogBinding.tvPollutantValue.text = "${pollutant.value} ${pollutant.unit}"
-        dialogBinding.tvPollutantDescription.text = pollutant.description
-
-        // Set progress based on pollutant index
-        dialogBinding.progressBar.progress = pollutant.index
-
-        // Set color based on index
-        dialogBinding.progressBar.progressTintList = android.content.res.ColorStateList.valueOf(
-            AQIUtils.getAQIColor(requireContext(), pollutant.index)
-        )
-
-        // Set health impact information
-        dialogBinding.tvHealthImpact.text = getHealthImpactForPollutant(pollutant.code)
-
-        // Create and show dialog
-        AlertDialog.Builder(requireContext()).setView(dialogBinding.root)
-            .setPositiveButton(android.R.string.ok, null)
-            .setNegativeButton(R.string.learn_more) { _, _ ->
-                navigateToPollutantEducation(pollutant.code)
-            }.create().show()
-    }
-
-    private fun getHealthImpactForPollutant(pollutantCode: String): String {
-        return when (pollutantCode) {
-            "pm25" -> getString(R.string.pm25_health_impact)
-            "pm10" -> getString(R.string.pm10_health_impact)
-            "o3" -> getString(R.string.o3_health_impact)
-            "no2" -> getString(R.string.no2_health_impact)
-            "so2" -> getString(R.string.so2_health_impact)
-            "co" -> getString(R.string.co_health_impact)
-            else -> getString(R.string.general_pollutant_impact)
-        }
-    }
-
-    private fun navigateToPollutantEducation(pollutantCode: String) {
-        Toast.makeText(
-            requireContext(),
-            getString(R.string.coming_soon_educational_content),
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
     private fun startLocationUpdates() {

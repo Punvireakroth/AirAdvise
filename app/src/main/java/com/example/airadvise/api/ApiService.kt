@@ -86,7 +86,11 @@ interface ApiService {
 
     // Forecasts --------
     @GET("api/locations/{id}/forecasts")
-    suspend fun getForecasts(@Path("id") locationId: Long): Response<ForecastResponse>
+    suspend fun getForecasts(
+        @Path("id") locationId: Long,
+        @Query("start_date") startDate: String? = null,
+        @Query("end_date") endDate: String? = null
+    ): Response<ForecastResponse>
 
     @GET("api/forecasts/by-location")
     suspend fun getForecastsByLocation(
