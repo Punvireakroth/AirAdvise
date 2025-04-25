@@ -113,7 +113,7 @@ class AQIGaugeView @JvmOverloads constructor(
         val width = width.toFloat()
         val height = height.toFloat()
         val centerX = width / 2
-        val centerY = height - 80f  // Move center point lower for half-circle
+        val centerY = height - 60f  // Move center point lower for half-circle
         
         // Size of the half-circle gauge
         val radius = Math.min(width, height * 1.6f) / 2 - 40f

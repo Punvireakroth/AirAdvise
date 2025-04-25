@@ -1,8 +1,10 @@
 package com.example.airadvise.models
 
+import com.google.gson.annotations.SerializedName
+
 data class AirQualityData(
     val id: Long,
-    val locationId: Long,
+    @SerializedName("location_id") val locationId: Long,
     val aqi: Int,
     val pm25: Double,
     val pm10: Double,

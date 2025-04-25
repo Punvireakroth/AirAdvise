@@ -26,7 +26,9 @@ data class AirQualityForecast(
     @SerializedName("created_at")
     val createdAt: String? = null,
     @SerializedName("updated_at")
-    val updatedAt: String? = null
+    val updatedAt: String? = null,
+    @SerializedName("recommended_activities")
+    val recommendedActivities: RecommendedActivities? = null
 ) {
     companion object {
         @RequiresApi(Build.VERSION_CODES.O)

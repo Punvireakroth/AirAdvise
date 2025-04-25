@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -20,7 +21,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.airadvise.R
-import com.example.airadvise.adapters.PollutantAdapter
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.DialogPollutantDetailsBinding
 import com.example.airadvise.databinding.FragmentHomeBinding
@@ -65,21 +65,25 @@ class HomeFragment : Fragment() {
     }
 
     private lateinit var locationProvider: LocationProvider
-    
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         locationProvider = LocationProvider(requireContext())
 
-        setSwipeRefresh()
-        
-        // Setup best day view button
-        binding.btnViewForecasts.setOnClickListener {
-            // Navigate to forecasts fragment
-            // Implement navigation to ForecastFragment when ready
-            Toast.makeText(requireContext(), "Forecast view coming soon", Toast.LENGTH_SHORT).show()
+        val greeting = when (java.time.LocalTime.now().hour) {
+            in 0..11 -> "Good morning"
+            in 12..16 -> "Good afternoon"
+            else -> "Good evening"
         }
+        binding.tvUsername.text = "$greeting, welcome to AirAdvise"
+
+        // Initialize location name with placeholder
+        binding.tvLocationName.text = "📍 San Francisco"
+
+
+        setSwipeRefresh()
 
         // Try to get the cache data first
         val cacheAirQualityData = AirQualityCache.getCachedAirQualityData(requireContext())
@@ -152,7 +156,8 @@ class HomeFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val response = safeApiCall {
-                    ApiClient.createApiService(requireContext()).getCurrentAirQuality(latitude, longitude)
+                    ApiClient.createApiService(requireContext())
+                        .getCurrentAirQuality(latitude, longitude)
                 }
 
                 when (response) {
@@ -180,90 +185,182 @@ class HomeFragment : Fragment() {
             }
         }
     }
-    
-    // Fetch forecast data from API - use similar approach to ForecastFragment
-    private fun fetchForecastData() {
-        lifecycleScope.launch {
-            try {
-                var locationId = 1L
-                
-                val location = locationProvider.getLastLocation()
-                if (location != null) {
-                    try {
-                        val airQualityResponse = safeApiCall {
-                            ApiClient.createApiService(requireContext())
-                                .getCurrentAirQuality(
-                                    location.latitude,
-                                    location.longitude
-                                )
-                        }
+
+
+private fun fetchForecastData() {
+    lifecycleScope.launch {
+        try {
+            // Always initialize with a valid ID (1 is your default)
+            var locationId = 1L
+            
+            val location = locationProvider.getLastLocation()
+            if (location != null) {
+                try {
+                    val airQualityResponse = safeApiCall {
+                        ApiClient.createApiService(requireContext())
+                            .getCurrentAirQuality(
+                                location.latitude,
+                                location.longitude
+                            )
+                    }
+                    
+                    if (airQualityResponse is Resource.Success) {
+                        val responseLocationId = airQualityResponse.data?.airQualityData?.locationId ?: 1L
+                        locationId = if (responseLocationId > 0) responseLocationId else 1L
                         
-                        if (airQualityResponse is Resource.Success) {
-                            locationId = airQualityResponse.data?.airQualityData?.locationId ?: 1L
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error getting location ID: ${e.message}")
+                        Log.d(TAG, "Got locationId from API: $responseLocationId, using: $locationId")
                     }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error getting location ID: ${e.message}")
                 }
-                
-                // Now get forecasts using this location ID
-                val response = safeApiCall {
-                    ApiClient.createApiService(requireContext())
-                        .getForecasts(locationId)
-                }
-                
-                when (response) {
-                    is Resource.Success -> {
-                        forecasts = response.data?.forecasts ?: emptyList()
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            updateBestDayRecommendation()
-                        }
-                    }
-                    is Resource.Error -> {
-                        Log.e(TAG, "Error fetching forecast: ${response.message}")
-                    }
-                    is Resource.Loading -> {
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Exception fetching forecast: ${e.message}")
             }
+            
+            if (locationId <= 0) {
+                locationId = 1L
+                Log.w(TAG, "Invalid locationId detected, forcing to default: $locationId")
+            }
+            
+            Log.d(TAG, "Fetching forecasts with locationId: $locationId")
+            
+            // Get forecasts using this location ID
+            val response = safeApiCall {
+                ApiClient.createApiService(requireContext())
+                    .getForecasts(locationId)
+            }
+            
+            // Rest of the code remains the same
+            when (response) {
+                is Resource.Success -> {
+                    forecasts = response.data?.forecasts ?: emptyList()
+                    val bestDayFromApi = response.data?.bestDay
+                    
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        if (bestDayFromApi != null) {
+                            updateBestDayRecommendation(bestDayFromApi)
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    Log.e(TAG, "Error fetching forecast: ${response.message}")
+                }
+                is Resource.Loading -> {}
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception fetching forecast: ${e.message}")
         }
     }
+}
+
+// Add this overloaded method that takes a bestDay parameter
+@RequiresApi(Build.VERSION_CODES.O)
+private fun updateBestDayRecommendation(bestDay: AirQualityForecast) {
+    binding.bestDayCard.visibility = View.VISIBLE
     
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun updateBestDayRecommendation() {
-        if (forecasts.isEmpty()) {
-            binding.bestDayCard.visibility = View.GONE
-            return
+    // Set best day details
+    binding.tvBestDay.text = bestDay.getFormattedDate()
+    binding.tvBestDayAqi.text = "AQI: ${bestDay.aqi}"
+    
+    // Set color based on AQI
+    binding.tvBestDayAqi.backgroundTintList = android.content.res.ColorStateList.valueOf(
+        bestDay.getCategoryColor()
+    )
+    
+    // Set description
+    binding.tvBestDayDescription.text = bestDay.description ?: "Best day for outdoor activities."
+    
+    // Make the best day card clickable to show details
+    binding.bestDayCard.setOnClickListener {
+        showBestDayDetailsDialog(bestDay)
+    }
+}
+
+// Create a dialog to show detailed information
+private fun showBestDayDetailsDialog(bestDay: AirQualityForecast) {
+    val dialogBuilder = AlertDialog.Builder(requireContext())
+    val dialogView = layoutInflater.inflate(R.layout.dialog_best_day_details, null)
+    dialogBuilder.setView(dialogView)
+    
+    // Basic info
+    val tvDialogDate = dialogView.findViewById<TextView>(R.id.tvDialogDate)
+    val tvDialogAqi = dialogView.findViewById<TextView>(R.id.tvDialogAqi)
+    val tvDialogCategory = dialogView.findViewById<TextView>(R.id.tvDialogCategory)
+    val tvDialogDescription = dialogView.findViewById<TextView>(R.id.tvDialogDescription)
+    val tvDialogRecommendation = dialogView.findViewById<TextView>(R.id.tvDialogRecommendation)
+    
+    // Pollutant values
+    val tvPM25Value = dialogView.findViewById<TextView>(R.id.tvPM25Value)
+    val tvPM10Value = dialogView.findViewById<TextView>(R.id.tvPM10Value)
+    val tvO3Value = dialogView.findViewById<TextView>(R.id.tvO3Value)
+    val tvNO2Value = dialogView.findViewById<TextView>(R.id.tvNO2Value)
+    val tvSO2Value = dialogView.findViewById<TextView>(R.id.tvSO2Value)
+    val tvCOValue = dialogView.findViewById<TextView>(R.id.tvCOValue)
+    
+    val llActivitiesList = dialogView.findViewById<LinearLayout>(R.id.llActivitiesList)
+    
+    // Set values
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        tvDialogDate.text = bestDay.getFormattedDate()
+    } else {
+        tvDialogDate.text = bestDay.forecastDate ?: "Unknown date"
+    }
+    
+    tvDialogAqi.text = "AQI: ${bestDay.aqi}"
+    tvDialogAqi.backgroundTintList = android.content.res.ColorStateList.valueOf(
+        bestDay.getCategoryColor()
+    )
+    
+    tvDialogCategory.text = bestDay.category
+    tvDialogDescription.text = bestDay.description
+    tvDialogRecommendation.text = bestDay.recommendation
+    
+    // Set pollutant values
+    tvPM25Value.text = "${bestDay.pm25} μg/m³"
+    tvPM10Value.text = "${bestDay.pm10} μg/m³"
+    tvO3Value.text = "${bestDay.o3} ppb"
+    tvNO2Value.text = "${bestDay.no2} ppm"
+    tvSO2Value.text = "${bestDay.so2} ppm"
+    tvCOValue.text = "${bestDay.co} ppb"
+    
+    // Get activities based on category
+    val recommendedActivities = bestDay.recommendedActivities
+    if (recommendedActivities != null) {
+        // Determine which activity list to show based on category
+        val activityList = when (bestDay.category.lowercase()) {
+            "good" -> recommendedActivities.high ?: recommendedActivities.moderate ?: recommendedActivities.low
+            "moderate" -> recommendedActivities.moderate ?: recommendedActivities.low
+            else -> recommendedActivities.low
         }
         
-        // Get best day for default activity (walking)
-        val bestDay = BestDayRecommendation.getBestDayForActivity(forecasts, defaultActivity)
-        
-        if (bestDay != null) {
-            binding.bestDayCard.visibility = View.VISIBLE
+        // Add activities to the list
+        if (activityList != null && activityList.isNotEmpty()) {
+            dialogView.findViewById<TextView>(R.id.tvRecommendedActivitiesTitle).visibility = View.VISIBLE
+            llActivitiesList.removeAllViews() // Clear any existing views
             
-            // Set best day details
-            binding.tvBestDay.text = bestDay.getFormattedDate()
-            binding.tvBestDayAqi.text = "AQI: ${bestDay.aqi}"
-            
-            // Set color based on AQI
-            binding.tvBestDayAqi.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                bestDay.getCategoryColor()
-            )
-            
-            // Set description
-            binding.tvBestDayDescription.text = if (BestDayRecommendation.isDaySuitableForActivity(bestDay, defaultActivity)) {
-                "This day is suitable for outdoor activities with ${bestDay.category} air quality."
-            } else {
-                "This is the best available day, but caution is advised as air quality is ${bestDay.category.lowercase()}."
+            for (activity in activityList) {
+                val activityView = TextView(requireContext()).apply {
+                    text = "• $activity"
+                    setPadding(0, 8, 0, 8)
+                    textSize = 14f
+                }
+                llActivitiesList.addView(activityView)
             }
         } else {
-            binding.bestDayCard.visibility = View.GONE
+            dialogView.findViewById<TextView>(R.id.tvRecommendedActivitiesTitle).visibility = View.GONE
         }
+    } else {
+        dialogView.findViewById<TextView>(R.id.tvRecommendedActivitiesTitle).visibility = View.GONE
     }
-
+    
+    // Create and show dialog
+    val dialog = dialogBuilder.create()
+    
+    // Add close button action
+    dialogView.findViewById<Button>(R.id.btnDialogClose).setOnClickListener {
+        dialog.dismiss()
+    }
+    
+    dialog.show()
+}
     private fun displayAirQualityData(airQualityData: AirQualityData) {
         val detailsBinding = binding.airQualityDetails
 
@@ -271,15 +368,13 @@ class HomeFragment : Fragment() {
         detailsBinding.aqiGaugeView.setAQI(airQualityData.aqi)
 
         // Set updated time
-        detailsBinding.tvUpdatedTime.text = "Updated at"
+        detailsBinding.tvUpdatedTime.text = "Updated at ${formatTimestamp(airQualityData.timestamp)}"
 
         // Set health implications and precautions
         detailsBinding.tvHealthImplications.text =
             AQIUtils.getHealthImplications(requireContext(), airQualityData.aqi)
         detailsBinding.tvPrecautions.text =
             AQIUtils.getPrecautions(requireContext(), airQualityData.aqi)
-        // Hide recycler view
-        detailsBinding.rvPollutants?.visibility = View.GONE
     }
 
     private fun displayLocationData(location: Location) {
@@ -359,7 +454,7 @@ class HomeFragment : Fragment() {
                     )
 
                     displayAirQualityData(airQualityData)
-                    
+
                     // Also refresh forecast data
                     fetchForecastData()
                 }
