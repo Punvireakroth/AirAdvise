@@ -190,8 +190,7 @@ class HomeFragment : Fragment() {
 private fun fetchForecastData() {
     lifecycleScope.launch {
         try {
-            // Always initialize with a valid ID (1 is your default)
-            var locationId = 1L
+            var locationId: Long? = null
             
             val location = locationProvider.getLastLocation()
             if (location != null) {
@@ -204,20 +203,31 @@ private fun fetchForecastData() {
                             )
                     }
                     
-                    if (airQualityResponse is Resource.Success) {
-                        val responseLocationId = airQualityResponse.data?.airQualityData?.locationId ?: 1L
-                        locationId = if (responseLocationId > 0) responseLocationId else 1L
+                    if (airQualityResponse is Resource.Success && airQualityResponse.data != null) {
+                        val responseLocationId = airQualityResponse.data.airQualityData.locationId
                         
-                        Log.d(TAG, "Got locationId from API: $responseLocationId, using: $locationId")
+                        if (responseLocationId > 0) {
+                            locationId = responseLocationId
+                            Log.d(TAG, "Got valid locationId from API: $locationId")
+                        } else {
+                            Log.w(TAG, "Got invalid locationId from API: $responseLocationId")
+                        }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error getting location ID: ${e.message}")
                 }
             }
             
-            if (locationId <= 0) {
-                locationId = 1L
-                Log.w(TAG, "Invalid locationId detected, forcing to default: $locationId")
+            // try get locationId from cache
+            if (locationId == null || locationId <= 0) {
+                val cachedData = AirQualityCache.getCachedAirQualityData(requireContext())
+                if (cachedData != null && cachedData.locationId > 0) {
+                    locationId = cachedData.locationId
+                    Log.d(TAG, "Using locationId from cache: $locationId")
+                } else {
+                    locationId = 1L
+                    Log.w(TAG, "No valid locationId found, using default: $locationId")
+                }
             }
             
             Log.d(TAG, "Fetching forecasts with locationId: $locationId")
