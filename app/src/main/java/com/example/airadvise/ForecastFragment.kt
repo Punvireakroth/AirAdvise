@@ -234,7 +234,6 @@ class ForecastFragment : Fragment() {
                     }
                 } else if (currentLocation != null) {
                     // For current location, we need to get locationId first from air quality data
-                    // Then use that ID to fetch forecasts
                     val airQualityResponse = safeApiCall {
                         ApiClient.createApiService(requireContext())
                             .getCurrentAirQuality(
@@ -245,8 +244,9 @@ class ForecastFragment : Fragment() {
                     
                     when (airQualityResponse) {
                         is Resource.Success -> {
-                            val locationId = 1L
-                            
+                            val locationId = airQualityResponse.data?.airQualityData?.locationId ?: 1L
+                            lastKnownLocationId = locationId
+
                             // Now get forecasts using this location ID
                             val forecastResponse = safeApiCall {
                                 ApiClient.createApiService(requireContext())
@@ -268,11 +268,11 @@ class ForecastFragment : Fragment() {
                         }
                         is Resource.Loading -> emptyList()
                     }
-                } else {
-                    // use a default location ID
+                } else {    
+                    val locationIdToUse = lastKnownLocationId ?: 1L
                     val forecastResponse = safeApiCall {
                         ApiClient.createApiService(requireContext())
-                            .getForecasts(1L) 
+                            .getForecasts(locationIdToUse) 
                     }
                     
                     when (forecastResponse) {
