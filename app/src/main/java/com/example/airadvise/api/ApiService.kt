@@ -7,6 +7,7 @@ import com.example.airadvise.models.AirQualityData
 import com.example.airadvise.models.AirQualityForecast
 import com.example.airadvise.models.Article
 import com.example.airadvise.models.AuthResponse
+import com.example.airadvise.models.City
 import com.example.airadvise.models.Feedback
 import com.example.airadvise.models.FeedbackResponse
 import com.example.airadvise.models.HealthTip
@@ -15,6 +16,7 @@ import com.example.airadvise.models.User
 import com.example.airadvise.models.UserNotification
 import com.example.airadvise.models.UserPreferences
 import com.example.airadvise.models.request.ChangePasswordRequest
+import com.example.airadvise.models.request.FavoriteCityRequest
 import com.example.airadvise.models.request.FeedbackRequest
 import com.example.airadvise.models.request.FeedbackResponseRequest
 import com.example.airadvise.models.request.LoginRequest
@@ -23,6 +25,7 @@ import com.example.airadvise.models.request.RegisterRequest
 import com.example.airadvise.models.response.AirQualityResponseData
 import com.example.airadvise.models.response.ForecastResponse
 import com.example.airadvise.models.response.LocationSearchResponse
+import com.example.airadvise.models.response.MapAirQualityResponse
 import com.example.airadvise.models.response.MessageResponse
 import com.example.airadvise.models.response.PaginatedResponse
 import retrofit2.Response
@@ -81,6 +84,31 @@ interface ApiService {
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double
     ): Response<ForecastResponse>
+
+
+    // Map and Location Management
+    @GET("api/cities/search")
+    suspend fun searchCities(@Query("query") query: String): Response<List<City>>
+
+    @GET("api/air-quality/map")
+    suspend fun getMapAirQuality(
+        @Query("lat") latitude: Double,
+        @Query("lng") longitude: Double,
+        @Query("zoom") zoom: Float,
+        @Query("pollutant") pollutant: String
+    ): Response<MapAirQualityResponse>
+
+    @GET("api/air-quality/city/{cityId}")
+    suspend fun getCityAirQuality(@Path("cityId") cityId: String): Response<AirQualityData>
+
+    @GET("api/cities/{cityId}")
+    suspend fun getCityDetails(@Path("cityId") cityId: String): Response<City>
+
+    @POST("api/user/favorites")
+    suspend fun addFavoriteCity(@Body request: FavoriteCityRequest): Response<Unit>
+
+    @DELETE("api/user/favorites/{cityId}")
+    suspend fun removeFavoriteCity(@Path("cityId") cityId: String): Response<Unit>
 
 
     // Notifications --------
