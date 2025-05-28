@@ -18,8 +18,11 @@ data class AirQualityData(
     val createdAt: String? = null,
     val updatedAt: String? = null,
     val isLive: Boolean = true,
-    val pollutants: Map<PollutantType, Pollutant> = emptyMap(),
 ) {
+    val pollutants: Map<PollutantType, Pollutant> by lazy {
+        getPollutants().associateBy { it.type }
+    }
+    
     // Extract the pollutants values
     fun getPollutants(): List<Pollutant> {
         val pollutants = mutableListOf<Pollutant>()
