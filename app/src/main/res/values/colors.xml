@@ -14,7 +14,9 @@
 
 
     // App colours
-    <color name="colorPrimary">#7E0023</color>
+    <color name="colorPrimary">#0A1429</color>
+    <color name="colorPrimaryDark">#050A14</color>
+    <color name="colorAccent">#3B82F6</color>
 
     // Chart
     <color name="chart_good">#A8E05F</color>
@@ -23,4 +25,12 @@
     <color name="chart_unhealthy">#F76C5E</color>
     <color name="chart_very_unhealthy">#A97ABC</color>
     <color name="chart_hazardous">#A87383</color>
+
+    <!-- Pollutant Colors -->
+    <color name="pollutant_good">#4CAF50</color>
+    <color name="pollutant_moderate">#FFC107</color>
+    <color name="pollutant_unhealthy_sensitive">#FF9800</color>
+    <color name="pollutant_unhealthy">#F44336</color>
+    <color name="pollutant_very_unhealthy">#9C27B0</color>
+    <color name="pollutant_hazardous">#7D0023</color>
 </resources>

@@ -1,3 +1,5 @@
+package com.example.airadvise.database
+
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Entity
@@ -33,6 +35,9 @@ interface CityDao {
     
     @Query("UPDATE cities SET lastSearched = :timestamp WHERE id = :cityId")
     suspend fun updateLastSearched(cityId: String, timestamp: Long)
+    
+    @Query("SELECT * FROM cities WHERE id = :cityId LIMIT 1")
+    suspend fun getCityById(cityId: String): CityEntity?
 }
 
 @Entity(tableName = "cities")
