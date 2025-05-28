@@ -49,7 +49,7 @@
                 android:id="@+id/aqiButton"
                 style="@style/PollutantButton"
                 android:text="AQI"
-                android:isSelected="true" />
+             />
 
             <Button
                 android:id="@+id/no2Button"

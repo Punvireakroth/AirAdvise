@@ -87,9 +87,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         cityDao = AppDatabase.getDatabase(requireContext()).cityDao()
         
         // Initialize the bottom sheet binding
-        bottomSheetBinding = binding.bottomSheet.getRoot().let { 
-            BottomSheetCityInfoBinding.bind(it)
-        }
+        bottomSheetBinding = BottomSheetCityInfoBinding.bind(binding.bottomSheet.root)
         
         // Initialize map
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -100,6 +98,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         
         // Setup pollutant selection
         setupPollutantSelection()
+        
+        // Set initial button states
+        updatePollutantButtonStates()
         
         // Now use bottomSheetBinding to access the views in the bottom sheet
         // Setup city search button
