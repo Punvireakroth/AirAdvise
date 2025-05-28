@@ -3,13 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/mapFragment">
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.example.airadvise.fragments.HomeFragment"
-        android:label="@string/home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/mapFragment"
+        android:name="com.example.airadvise.fragments.MapFragment"
+        android:label="MapFragment"
+        tools:layout="@layout/fragment_map">
+        <action
+            android:id="@+id/action_mapFragment_to_searchCityFragment"
+            app:destination="@id/searchCityFragment"
+            />
+        <action
+            android:id="@+id/action_mapFragment_to_forecastFragment"
+            app:destination="@id/forecastFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_cityDetailsFragment"
+            app:destination="@id/cityDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchCityFragment"
+        android:name="com.example.airadvise.fragments.SearchCityFragment"
+        android:label="SearchCityFragment"
+        tools:layout="@layout/fragment_search_city">
+        <action
+            android:id="@+id/action_searchCityFragment_to_mapFragment"
+            app:destination="@id/mapFragment"
+            app:popUpTo="@id/mapFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/forecastFragment"
@@ -18,14 +41,11 @@
         tools:layout="@layout/fragment_forecast" />
 
     <fragment
-        android:id="@+id/locationsFragment"
-        android:name="com.example.airadvise.fragments.LocationsFragment"
-        android:label="@string/locations"
-        tools:layout="@layout/fragment_locations" />
-
-    <fragment
-        android:id="@+id/profileFragment"
-        android:name="com.example.airadvise.fragments.ProfileFragment"
-        android:label="@string/profile"
-        tools:layout="@layout/fragment_profile" />
+        android:id="@+id/cityDetailsFragment"
+        android:name="com.example.airadvise.fragments.CityDetailsFragment"
+        android:label="CityDetailsFragment">
+        <argument
+            android:name="cityId"
+            app:argType="string" />
+    </fragment>
 </navigation>

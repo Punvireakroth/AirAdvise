@@ -29,39 +29,32 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupNavigation()
+        // Setup Navigation
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+        
+        // Setup Bottom Navigation
+        binding.bottomNavigation.setupWithNavController(navController)
+        
+        // Handle deep links if any
+        handleIntent(intent)
+
         setupLogout()
         checkLocationPermissions()
     }
 
-    private fun setupNavigation() {
-        // Set up Navigation Controller with Bottom Navigation
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-        
-        // Find the bottom navigation view
-        val bottomNav = binding.bottomNavigation
-        bottomNav.setupWithNavController(navController)
-        
-        // Handle navigation destination changes
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            // You can handle UI changes when destinations change
-            when (destination.id) {
-                R.id.homeFragment -> {
-                    // Handle home fragment selected
-                }
-                R.id.forecastFragment -> {
-                    // Handle forecast fragment selected
-                }
-                R.id.locationsFragment -> {
-                    // Handle locations fragment selected
-                }
-                R.id.profileFragment -> {
-                    // Handle profile fragment selected
-                }
-                // Add other destinations in the future
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        // Check if there's a city ID to load
+        intent.getStringExtra(EXTRA_CITY_ID)?.let { cityId ->
+            val bundle = Bundle().apply {
+                putString("cityId", cityId)
             }
+            navController.navigate(R.id.mapFragment, bundle)
         }
     }
 
@@ -163,5 +156,9 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    companion object {
+        const val EXTRA_CITY_ID = "city_id"
     }
 }
