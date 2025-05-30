@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,6 +41,7 @@ class SearchCityFragment : Fragment() {
     private lateinit var searchAdapter: CitySearchAdapter
     private val searchHandler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
+    private val TAG = "SearchCityFragment"
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -142,6 +144,8 @@ class SearchCityFragment : Fragment() {
             return
         }
         
+        Log.d(TAG, "Searching for: $query")
+        
         lifecycleScope.launch {
             try {
                 // Use safeApiCall if needed, similar to other fragments
@@ -149,7 +153,8 @@ class SearchCityFragment : Fragment() {
                 binding.progressBar.visibility = View.GONE
                 
                 if (response.isSuccessful) {
-                    val cities = response.body() ?: emptyList()
+                    val paginatedResponse = response.body()
+                    val cities = paginatedResponse?.data ?: emptyList()  
                     
                     if (cities.isEmpty()) {
                         binding.noResultsText.visibility = View.VISIBLE
@@ -160,7 +165,8 @@ class SearchCityFragment : Fragment() {
                     // Update favorite status from local database
                     val updatedCities = cities.map { city ->
                         try {
-                            val localCity = cityDao.getCityById(city.id)
+                            val cityId = city.id.toString()
+                            val localCity = cityDao.getCityById(cityId)
                             city.copy(isFavorite = localCity?.isFavorite ?: false)
                         } catch (e: Exception) {
                             // If there's an error, just return the original city
@@ -169,11 +175,15 @@ class SearchCityFragment : Fragment() {
                     }
                     
                     searchAdapter.submitList(updatedCities)
+                    
+                    Log.d(TAG, "Response: ${response.body()}")
+                    Log.d(TAG, "Cities found: ${cities.size}")
                 } else {
-                    Toast.makeText(requireContext(), "Error searching cities", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Error searching cities: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 binding.progressBar.visibility = View.GONE
+                Log.e("SearchCity", "Error searching cities", e)
                 Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }

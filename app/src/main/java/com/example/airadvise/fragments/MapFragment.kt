@@ -252,8 +252,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val response = apiService.searchCities("nearby:$latitude,$longitude")
                 binding.progressBar.visibility = View.GONE
                 
-                if (response.isSuccessful && !response.body().isNullOrEmpty()) {
-                    updateSelectedCity(response.body()!!.first())
+                if (response.isSuccessful) {
+                    val cities = response.body()?.data ?: emptyList()
+                    if (cities.isNotEmpty()) {
+                        updateSelectedCity(cities.first())
+                    } else {
+                        Toast.makeText(requireContext(), "No cities found", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
                 binding.progressBar.visibility = View.GONE
@@ -394,8 +399,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun loadAirQualityMap(city: City) {
+        // Show progress indicator
+        binding.progressBar.visibility = View.VISIBLE
+        
         lifecycleScope.launch {
             try {
+                Log.d("MapDebug", "Loading air quality map for: ${city.name}")
+                Log.d("MapDebug", "Latitude: ${city.latitude}, Longitude: ${city.longitude}")
+                Log.d("MapDebug", "Zoom level: ${map.cameraPosition.zoom}")
+                Log.d("MapDebug", "Pollutant type: ${currentPollutant.name}")
+                
                 val response = apiService.getMapAirQuality(
                     city.latitude,
                     city.longitude,
@@ -403,36 +416,67 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     currentPollutant.name
                 )
                 
+                binding.progressBar.visibility = View.GONE
+                
                 if (response.isSuccessful && response.body() != null) {
                     val mapData = response.body()!!
+                    Log.d("MapDebug", "Response successful! Map URL: ${mapData.mapUrl}")
                     
                     // Add tile overlay to map
                     map.clear()
                     val tileProvider = object : UrlTileProvider(256, 256) {
                         override fun getTileUrl(x: Int, y: Int, zoom: Int): URL? {
+                            val url = "${mapData.mapUrl}/$zoom/$x/$y"
+                            Log.d("MapDebug", "Generated tile URL: $url")
                             return try {
-                                URL("${mapData.mapUrl}/$zoom/$x/$y")
+                                URL(url)
                             } catch (e: Exception) {
+                                Log.e("MapDebug", "Error creating URL: ${e.message}")
                                 null
                             }
                         }
                     }
                     
-                    map.addTileOverlay(
+                    val tileOverlay = map.addTileOverlay(
                         TileOverlayOptions()
                             .tileProvider(tileProvider)
                             .transparency(0.3f)
                     )
                     
+                    Log.d("MapDebug", "Tile overlay added: ${tileOverlay != null}")
+                    
                     // Add city marker
-                    map.addMarker(
+                    val marker = map.addMarker(
                         MarkerOptions()
                             .position(LatLng(city.latitude, city.longitude))
                             .title(city.name)
                     )
+                    
+                    Log.d("MapDebug", "Marker added: ${marker != null}")
+                    
+                    // Force a refresh of the map
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        LatLng(city.latitude, city.longitude),
+                        map.cameraPosition.zoom
+                    ))
+                } else {
+                    val errorBody = response.errorBody()?.string() ?: "No error details"
+                    Log.e("MapDebug", "API call failed with code: ${response.code()}")
+                    Log.e("MapDebug", "Error body: $errorBody")
+                    Toast.makeText(
+                        requireContext(),
+                        "Error loading map data: ${response.code()}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error loading map data: ${e.message}", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
+                Log.e("MapDebug", "Exception in loadAirQualityMap", e)
+                Toast.makeText(
+                    requireContext(),
+                    "Error loading map data: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

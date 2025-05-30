@@ -72,6 +72,7 @@ interface ApiService {
     ): Response<AirQualityResponseData>
 
     // Forecasts --------
+    // IN OPERATE***
     @GET("api/locations/{id}/forecasts")
     suspend fun getForecasts(
         @Path("id") locationId: Long,
@@ -79,16 +80,9 @@ interface ApiService {
         @Query("end_date") endDate: String? = null
     ): Response<ForecastResponse>
 
-    @GET("api/forecasts/by-location")
-    suspend fun getForecastsByLocation(
-        @Query("latitude") latitude: Double,
-        @Query("longitude") longitude: Double
-    ): Response<ForecastResponse>
-
-
     // Map and Location Management
     @GET("api/cities/search")
-    suspend fun searchCities(@Query("query") query: String): Response<List<City>>
+    suspend fun searchCities(@Query("query") query: String): Response<PaginatedResponse<City>>
 
     @GET("api/air-quality/map")
     suspend fun getMapAirQuality(
