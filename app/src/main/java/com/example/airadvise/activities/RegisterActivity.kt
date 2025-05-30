@@ -2,19 +2,16 @@ package com.example.airadvise.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.airadvise.MainActivity
 import com.example.airadvise.R
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.ActivityRegisterBinding
 import com.example.airadvise.models.request.RegisterRequest
-import com.example.airadvise.utils.SessionManager
 import com.example.airadvise.utils.Validator
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall

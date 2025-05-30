@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.airadvise.MainActivity
 import com.example.airadvise.R
 import com.example.airadvise.utils.SessionManager
 import kotlinx.coroutines.launch

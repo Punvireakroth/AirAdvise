@@ -58,6 +58,8 @@ import com.example.airadvise.models.request.FavoriteCityRequest
 import com.example.airadvise.models.response.MapAirQualityResponse
 import java.net.URL
 import android.content.res.Resources
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall
 
@@ -83,18 +85,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+
+            insets
+        }
+
         // Initialize dependencies
         apiService = ApiClient.createApiService(requireContext())
         cityDao = AppDatabase.getDatabase(requireContext()).cityDao()
-        
+
         // Initialize the bottom sheet binding
         bottomSheetBinding = BottomSheetCityInfoBinding.bind(binding.bottomSheet.root)
-        
+
         // Initialize map
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        
+
         // Check if we have a city ID from navigation arguments
         arguments?.getString("cityId")?.let { cityId ->
             Log.d("MapFragment", "Received cityId: $cityId")
@@ -138,22 +147,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
-        
+
         // Setup bottom sheet
         setupBottomSheet()
-        
-        // Setup pollutant selection
-        setupPollutantSelection()
-        
-        // Set initial button states
-        updatePollutantButtonStates()
-        
+
         // Now use bottomSheetBinding to access the views in the bottom sheet
         // Setup city search button
         bottomSheetBinding.searchButton.setOnClickListener {
             navigateToSearch()
         }
-        
+
         // Setup menu button
         bottomSheetBinding.menuButton.setOnClickListener {
             showCityOptions()
@@ -162,11 +165,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-        
+
         // Configure map settings
         map.uiSettings.isZoomControlsEnabled = true
         map.uiSettings.isMyLocationButtonEnabled = true
-        
+
         // Request location permission if needed
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -177,7 +180,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         } else {
             requestLocationPermission()
         }
-        
+
         // Set map style
         try {
             val success = map.setMapStyle(
@@ -189,7 +192,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         } catch (e: Resources.NotFoundException) {
             Log.e("MapFragment", "Can't find style. Error: ", e)
         }
-        
+
         // If we already have a city from arguments, use it
         if (currentCity != null) {
             Log.d("MapFragment", "Using saved city: ${currentCity?.name}")
@@ -198,7 +201,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             // Otherwise load last city or get current location
             loadLastCity()
         }
-        
+
         // Setup map click listener
         map.setOnMapClickListener { latLng ->
             fetchCityAtLocation(latLng.latitude, latLng.longitude)
@@ -209,47 +212,29 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val bottomSheetView = binding.bottomSheet.root
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView)
         bottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
-        
-        bottomSheetBehavior?.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+
+        bottomSheetBehavior?.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 // Handle state changes
             }
-            
+
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 // Handle slide events
             }
         })
     }
 
-    private fun setupPollutantSelection() {
-        binding.apply {
-            aqiButton.setOnClickListener { updatePollutantType(PollutantType.AQI) }
-            no2Button.setOnClickListener { updatePollutantType(PollutantType.NO2) }
-            pm25Button.setOnClickListener { updatePollutantType(PollutantType.PM25) }
-            pm10Button.setOnClickListener { updatePollutantType(PollutantType.PM10) }
-            o3Button.setOnClickListener { updatePollutantType(PollutantType.O3) }
-        }
-    }
 
     private fun updatePollutantType(type: PollutantType) {
         currentPollutant = type
-        updatePollutantButtonStates()
         currentCity?.let { loadAirQualityMap(it) }
     }
 
-    private fun updatePollutantButtonStates() {
-        binding.apply {
-            aqiButton.isSelected = currentPollutant == PollutantType.AQI
-            no2Button.isSelected = currentPollutant == PollutantType.NO2
-            pm25Button.isSelected = currentPollutant == PollutantType.PM25
-            pm10Button.isSelected = currentPollutant == PollutantType.PM10
-            o3Button.isSelected = currentPollutant == PollutantType.O3
-        }
-    }
 
     private fun getCurrentLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        
+
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -277,14 +262,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val lastCityId = withContext(Dispatchers.IO) {
                 PreferenceManager.getInstance(requireContext()).getLastViewedCityId()
             }
-            
+
             if (lastCityId != null) {
                 try {
                     // Try to get from database first
                     val cityEntity = withContext(Dispatchers.IO) {
                         cityDao.getCityById(lastCityId)
                     }
-                    
+
                     if (cityEntity != null) {
                         // Convert to City model
                         val city = City(
@@ -312,13 +297,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun fetchCityAtLocation(latitude: Double, longitude: Double) {
         binding.progressBar.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
             try {
                 Log.d("MapFragment", "Fetching city at location: $latitude, $longitude")
                 val response = apiService.searchCities("nearby:$latitude,$longitude")
                 binding.progressBar.visibility = View.GONE
-                
+
                 if (response.isSuccessful) {
                     val cities = response.body()?.data ?: emptyList()
                     if (cities.isNotEmpty()) {
@@ -326,42 +311,51 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         updateSelectedCity(cities.first())
                     } else {
                         Log.e("MapFragment", "No cities found")
-                        Toast.makeText(requireContext(), "No cities found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "No cities found", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 } else {
                     Log.e("MapFragment", "API call failed: ${response.code()}")
-                    Toast.makeText(requireContext(), "Error finding city: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Error finding city: ${response.code()}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } catch (e: Exception) {
                 binding.progressBar.visibility = View.GONE
                 Log.e("MapFragment", "Exception in fetchCityAtLocation", e)
-                Toast.makeText(requireContext(), "Error finding city: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Error finding city: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
     private fun updateSelectedCity(city: City) {
         currentCity = city
-        
+
         // Save as last viewed city
         lifecycleScope.launch(Dispatchers.IO) {
             PreferenceManager.getInstance(requireContext()).saveLastViewedCityId(city.id)
-            
+
             // Update city in database with last searched timestamp - MOVE TO IO DISPATCHER
             cityDao.updateLastSearched(city.id, System.currentTimeMillis())
-            
+
             // Now update UI on main thread
             withContext(Dispatchers.Main) {
                 // Move camera to city
                 val latLng = LatLng(city.latitude, city.longitude)
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f))
-                
+
                 // Update bottom sheet
                 updateCityInfo(city)
-                
+
                 // Load air quality data
                 loadAirQualityData(city)
-                
+
                 // Load air quality map
                 loadAirQualityMap(city)
             }
@@ -370,17 +364,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateCityInfo(city: City) {
         bottomSheetBinding.cityNameText.text = city.name
-        
+
         // Check if city is favorite - RUN ON IO THREAD
         lifecycleScope.launch(Dispatchers.IO) {
             val cityEntity = cityDao.getCityById(city.id)
-            
+
             // Update UI on main thread
             withContext(Dispatchers.Main) {
                 bottomSheetBinding.favoriteButton.isSelected = cityEntity?.isFavorite == true
             }
         }
-        
+
         // Setup favorite button
         bottomSheetBinding.favoriteButton.setOnClickListener {
             toggleFavorite(city)
@@ -390,28 +384,32 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun toggleFavorite(city: City) {
         lifecycleScope.launch(Dispatchers.IO) {
             val isFavorite = !(cityDao.getCityById(city.id)?.isFavorite ?: false)
-            
+
             try {
                 if (isFavorite) {
                     apiService.addFavoriteCity(FavoriteCityRequest(city.id))
                 } else {
                     apiService.removeFavoriteCity(city.id)
                 }
-                
+
                 // Update local database
                 cityDao.updateFavoriteStatus(city.id, isFavorite)
-                
+
                 // Update UI on main thread
                 withContext(Dispatchers.Main) {
                     bottomSheetBinding.favoriteButton.isSelected = isFavorite
-                    
+
                     // Show confirmation
                     val message = if (isFavorite) "Added to favorites" else "Removed from favorites"
                     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Error updating favorites: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Error updating favorites: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -423,23 +421,28 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 
         bottomSheetBinding.aqiProgressBar.visibility = View.VISIBLE
-        
         lifecycleScope.launch {
             try {
                 val response = safeApiCall {
                     apiService.getCityAirQuality(city.id)
                 }
-                
+
                 bottomSheetBinding.aqiProgressBar.visibility = View.GONE
-                
+
                 when (response) {
                     is Resource.Success -> {
                         val airQualityData = response.data!!
                         updateAirQualityInfo(airQualityData)
                     }
+
                     is Resource.Error -> {
-                        Toast.makeText(requireContext(), "Error: ${response.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Error: ${response.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
+
                     is Resource.Loading -> {
                         // Handle loading state
                     }
@@ -447,21 +450,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             } catch (e: Exception) {
                 bottomSheetBinding.aqiProgressBar.visibility = View.GONE
                 Log.e("MapFragment", "Error loading air quality: ${e.message}")
-                Toast.makeText(requireContext(), "Error loading air quality: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Error loading air quality: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
     private fun updateAirQualityInfo(data: AirQualityData) {
         bottomSheetBinding.aqiValueText.text = data.aqi.toString()
-        
+
         // Update AQI level color
         val aqiColor = PollutantColorUtils.getColorForAQI(data.aqi)
-        bottomSheetBinding.aqiValueText.setTextColor(ContextCompat.getColor(requireContext(), aqiColor))
-        
+        bottomSheetBinding.aqiValueText.setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                aqiColor
+            )
+        )
+
         // Update live indicator
         binding.liveIndicator.visibility = if (data.isLive) View.VISIBLE else View.GONE
-        
+
         // Update pollutant values
         updatePollutantValues(data.pollutants)
     }
@@ -470,49 +482,69 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // Use bottomSheetBinding for these views
         pollutants[PollutantType.NO2]?.let { no2 ->
             bottomSheetBinding.no2ValueText.text = "${no2.value} ${no2.unit}"
-            bottomSheetBinding.no2ValueText.setTextColor(ContextCompat.getColor(requireContext(), no2.level.color))
+            bottomSheetBinding.no2ValueText.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    no2.level.color
+                )
+            )
         }
-        
+
         pollutants[PollutantType.PM25]?.let { pm25 ->
             bottomSheetBinding.pm25ValueText.text = "${pm25.value} ${pm25.unit}"
-            bottomSheetBinding.pm25ValueText.setTextColor(ContextCompat.getColor(requireContext(), pm25.level.color))
+            bottomSheetBinding.pm25ValueText.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    pm25.level.color
+                )
+            )
         }
-        
+
         pollutants[PollutantType.PM10]?.let { pm10 ->
             bottomSheetBinding.pm10ValueText.text = "${pm10.value} ${pm10.unit}"
-            bottomSheetBinding.pm10ValueText.setTextColor(ContextCompat.getColor(requireContext(), pm10.level.color))
+            bottomSheetBinding.pm10ValueText.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    pm10.level.color
+                )
+            )
         }
-        
+
         pollutants[PollutantType.O3]?.let { o3 ->
             bottomSheetBinding.o3ValueText.text = "${o3.value} ${o3.unit}"
-            bottomSheetBinding.o3ValueText.setTextColor(ContextCompat.getColor(requireContext(), o3.level.color))
+            bottomSheetBinding.o3ValueText.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    o3.level.color
+                )
+            )
         }
     }
 
     private fun loadAirQualityMap(city: City) {
         // Show progress indicator
         binding.progressBar.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
             try {
                 Log.d("MapDebug", "Loading air quality map for: ${city.name}")
                 Log.d("MapDebug", "Latitude: ${city.latitude}, Longitude: ${city.longitude}")
                 Log.d("MapDebug", "Zoom level: ${map.cameraPosition.zoom}")
                 Log.d("MapDebug", "Pollutant type: ${currentPollutant.name}")
-                
+
                 val response = apiService.getMapAirQuality(
                     city.latitude,
                     city.longitude,
                     map.cameraPosition.zoom,
                     currentPollutant.name
                 )
-                
+
                 binding.progressBar.visibility = View.GONE
-                
+
                 if (response.isSuccessful && response.body() != null) {
                     val mapData = response.body()!!
                     Log.d("MapDebug", "Response successful! Map URL: ${mapData.mapUrl}")
-                    
+
                     // Add tile overlay to map
                     map.clear()
                     val tileProvider = object : UrlTileProvider(256, 256) {
@@ -527,29 +559,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                             }
                         }
                     }
-                    
+
                     val tileOverlay = map.addTileOverlay(
                         TileOverlayOptions()
                             .tileProvider(tileProvider)
                             .transparency(0.3f)
                     )
-                    
+
                     Log.d("MapDebug", "Tile overlay added: ${tileOverlay != null}")
-                    
+
                     // Add city marker
                     val marker = map.addMarker(
                         MarkerOptions()
                             .position(LatLng(city.latitude, city.longitude))
                             .title(city.name)
                     )
-                    
+
                     Log.d("MapDebug", "Marker added: ${marker != null}")
-                    
+
                     // Force a refresh of the map
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        LatLng(city.latitude, city.longitude),
-                        map.cameraPosition.zoom
-                    ))
+                    map.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(city.latitude, city.longitude),
+                            map.cameraPosition.zoom
+                        )
+                    )
                 } else {
                     val errorBody = response.errorBody()?.string() ?: "No error details"
                     Log.e("MapDebug", "API call failed with code: ${response.code()}")
@@ -579,21 +613,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun showCityOptions() {
         val popupMenu = PopupMenu(requireContext(), bottomSheetBinding.menuButton)
         popupMenu.menuInflater.inflate(R.menu.city_options_menu, popupMenu.menu)
-        
+
         popupMenu.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_view_forecast -> {
                     currentCity?.let { navigateToForecast(it) }
                     true
                 }
+
                 R.id.action_view_details -> {
                     currentCity?.let { navigateToCityDetails(it) }
                     true
                 }
+
                 else -> false
             }
         }
-        
+
         popupMenu.show()
     }
 
@@ -613,14 +649,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun loadCityFromApi(cityId: String) {
         binding.progressBar.visibility = View.VISIBLE
-        
+
         lifecycleScope.launch {
             try {
                 Log.d("MapFragment", "Loading city from API: $cityId")
                 val response = apiService.getCityDetails(cityId)
-                
+
                 binding.progressBar.visibility = View.GONE
-                
+
                 if (response.isSuccessful && response.body() != null) {
                     val city = response.body()!!
                     Log.d("MapFragment", "Successfully loaded city from API: ${city.name}")
@@ -633,12 +669,20 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     }
                 } else {
                     Log.e("MapFragment", "Failed to load city from API: ${response.code()}")
-                    Toast.makeText(requireContext(), "Could not find the selected city", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Could not find the selected city",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } catch (e: Exception) {
                 binding.progressBar.visibility = View.GONE
                 Log.e("MapFragment", "Error loading city from API", e)
-                Toast.makeText(requireContext(), "Error loading city: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Error loading city: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

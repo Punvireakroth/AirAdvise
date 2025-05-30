@@ -33,4 +33,7 @@
     <color name="pollutant_unhealthy">#F44336</color>
     <color name="pollutant_very_unhealthy">#9C27B0</color>
     <color name="pollutant_hazardous">#7D0023</color>
+
+    <!-- Bottom Navigation -->
+    <color name="bottom_nav_item_color">#FFFFFF</color>
 </resources>

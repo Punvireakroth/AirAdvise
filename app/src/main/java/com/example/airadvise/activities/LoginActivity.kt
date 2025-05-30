@@ -6,12 +6,10 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.airadvise.MainActivity
 import com.example.airadvise.R
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.ActivityLoginBinding
 import com.example.airadvise.models.request.LoginRequest
-import com.example.airadvise.utils.LoadingStateManager
 import com.example.airadvise.utils.Validator
 import com.example.airadvise.utils.SessionManager
 import com.example.airadvise.utils.Resource

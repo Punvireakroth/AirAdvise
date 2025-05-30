@@ -1,4 +1,4 @@
-package com.example.airadvise
+package com.example.airadvise.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -19,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import android.provider.Settings
 import android.net.Uri
+import com.example.airadvise.R
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

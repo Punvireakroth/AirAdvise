@@ -8,6 +8,23 @@
         <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:fitsSystemWindows">true</item>
+        
+        <!-- App bar styling -->
+        <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
+        <item name="appBarLayoutStyle">@style/Widget.App.AppBarLayout</item>
+    </style>
+
+    <!-- Toolbar style -->
+    <style name="Widget.App.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="titleTextColor">@android:color/white</item>
+    </style>
+
+    <!-- AppBarLayout style -->
+    <style name="Widget.App.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Primary">
+        <item name="android:background">@color/colorPrimary</item>
     </style>
 
     <!-- Pollutant Button Style -->
