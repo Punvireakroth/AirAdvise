@@ -30,6 +30,8 @@ import androidx.core.content.res.ResourcesCompat
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 import com.example.airadvise.databinding.FragmentMapBinding
 import com.example.airadvise.databinding.BottomSheetCityInfoBinding
@@ -93,6 +95,50 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         
+        // Check if we have a city ID from navigation arguments
+        arguments?.getString("cityId")?.let { cityId ->
+            Log.d("MapFragment", "Received cityId: $cityId")
+            // Load city by ID - we'll load this after map is ready
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    // Try to get from database first
+                    val cityEntity = cityDao.getCityById(cityId)
+                    if (cityEntity != null) {
+                        // Convert to City model
+                        val city = City(
+                            id = cityEntity.id,
+                            name = cityEntity.name,
+                            country = cityEntity.country,
+                            latitude = cityEntity.latitude,
+                            longitude = cityEntity.longitude,
+                            isFavorite = cityEntity.isFavorite,
+                            lastSearched = cityEntity.lastSearched
+                        )
+                        withContext(Dispatchers.Main) {
+                            Log.d("MapFragment", "Found city in database: ${city.name}")
+                            // Wait for map to be ready
+                            if (::map.isInitialized) {
+                                updateSelectedCity(city)
+                            } else {
+                                // Save city to use when map is ready
+                                currentCity = city
+                            }
+                        }
+                    } else {
+                        // If not in database, try API
+                        withContext(Dispatchers.Main) {
+                            loadCityFromApi(cityId)
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Log.e("MapFragment", "Error loading city from database", e)
+                        loadCityFromApi(cityId)
+                    }
+                }
+            }
+        }
+        
         // Setup bottom sheet
         setupBottomSheet()
         
@@ -128,7 +174,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             map.isMyLocationEnabled = true
-            getCurrentLocation()
         } else {
             requestLocationPermission()
         }
@@ -145,8 +190,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             Log.e("MapFragment", "Can't find style. Error: ", e)
         }
         
-        // Load last viewed city or default
-        loadLastCity()
+        // If we already have a city from arguments, use it
+        if (currentCity != null) {
+            Log.d("MapFragment", "Using saved city: ${currentCity?.name}")
+            updateSelectedCity(currentCity!!)
+        } else {
+            // Otherwise load last city or get current location
+            loadLastCity()
+        }
         
         // Setup map click listener
         map.setOnMapClickListener { latLng ->
@@ -222,18 +273,33 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun loadLastCity() {
-        lifecycleScope.launch {
-            val preferences = PreferenceManager.getInstance(requireContext())
-            val lastCityId = preferences.getLastViewedCityId()
+        lifecycleScope.launch(Dispatchers.Main) {
+            val lastCityId = withContext(Dispatchers.IO) {
+                PreferenceManager.getInstance(requireContext()).getLastViewedCityId()
+            }
             
             if (lastCityId != null) {
                 try {
-                    val response = apiService.getCityDetails(lastCityId)
-                    if (response.isSuccessful && response.body() != null) {
-                        val city = response.body()!!
+                    // Try to get from database first
+                    val cityEntity = withContext(Dispatchers.IO) {
+                        cityDao.getCityById(lastCityId)
+                    }
+                    
+                    if (cityEntity != null) {
+                        // Convert to City model
+                        val city = City(
+                            id = cityEntity.id,
+                            name = cityEntity.name,
+                            country = cityEntity.country,
+                            latitude = cityEntity.latitude,
+                            longitude = cityEntity.longitude,
+                            isFavorite = cityEntity.isFavorite,
+                            lastSearched = cityEntity.lastSearched
+                        )
                         updateSelectedCity(city)
                     } else {
-                        getCurrentLocation()
+                        // If not in database, try API
+                        loadCityFromApi(lastCityId)
                     }
                 } catch (e: Exception) {
                     getCurrentLocation()
@@ -249,19 +315,26 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         
         lifecycleScope.launch {
             try {
+                Log.d("MapFragment", "Fetching city at location: $latitude, $longitude")
                 val response = apiService.searchCities("nearby:$latitude,$longitude")
                 binding.progressBar.visibility = View.GONE
                 
                 if (response.isSuccessful) {
                     val cities = response.body()?.data ?: emptyList()
                     if (cities.isNotEmpty()) {
+                        Log.d("MapFragment", "Found city: ${cities.first().name}")
                         updateSelectedCity(cities.first())
                     } else {
+                        Log.e("MapFragment", "No cities found")
                         Toast.makeText(requireContext(), "No cities found", Toast.LENGTH_SHORT).show()
                     }
+                } else {
+                    Log.e("MapFragment", "API call failed: ${response.code()}")
+                    Toast.makeText(requireContext(), "Error finding city: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 binding.progressBar.visibility = View.GONE
+                Log.e("MapFragment", "Exception in fetchCityAtLocation", e)
                 Toast.makeText(requireContext(), "Error finding city: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -271,34 +344,41 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         currentCity = city
         
         // Save as last viewed city
-        PreferenceManager.getInstance(requireContext()).saveLastViewedCityId(city.id)
-        
-        // Update city in database with last searched timestamp
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
+            PreferenceManager.getInstance(requireContext()).saveLastViewedCityId(city.id)
+            
+            // Update city in database with last searched timestamp - MOVE TO IO DISPATCHER
             cityDao.updateLastSearched(city.id, System.currentTimeMillis())
+            
+            // Now update UI on main thread
+            withContext(Dispatchers.Main) {
+                // Move camera to city
+                val latLng = LatLng(city.latitude, city.longitude)
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f))
+                
+                // Update bottom sheet
+                updateCityInfo(city)
+                
+                // Load air quality data
+                loadAirQualityData(city)
+                
+                // Load air quality map
+                loadAirQualityMap(city)
+            }
         }
-        
-        // Move camera to city
-        val latLng = LatLng(city.latitude, city.longitude)
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f))
-        
-        // Update bottom sheet
-        updateCityInfo(city)
-        
-        // Load air quality data
-        loadAirQualityData(city)
-        
-        // Load air quality map
-        loadAirQualityMap(city)
     }
 
     private fun updateCityInfo(city: City) {
         bottomSheetBinding.cityNameText.text = city.name
         
-        // Check if city is favorite
-        lifecycleScope.launch {
+        // Check if city is favorite - RUN ON IO THREAD
+        lifecycleScope.launch(Dispatchers.IO) {
             val cityEntity = cityDao.getCityById(city.id)
-            bottomSheetBinding.favoriteButton.isSelected = cityEntity?.isFavorite == true
+            
+            // Update UI on main thread
+            withContext(Dispatchers.Main) {
+                bottomSheetBinding.favoriteButton.isSelected = cityEntity?.isFavorite == true
+            }
         }
         
         // Setup favorite button
@@ -308,7 +388,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun toggleFavorite(city: City) {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val isFavorite = !(cityDao.getCityById(city.id)?.isFavorite ?: false)
             
             try {
@@ -320,18 +400,28 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 
                 // Update local database
                 cityDao.updateFavoriteStatus(city.id, isFavorite)
-                bottomSheetBinding.favoriteButton.isSelected = isFavorite
                 
-                // Show confirmation
-                val message = if (isFavorite) "Added to favorites" else "Removed from favorites"
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                // Update UI on main thread
+                withContext(Dispatchers.Main) {
+                    bottomSheetBinding.favoriteButton.isSelected = isFavorite
+                    
+                    // Show confirmation
+                    val message = if (isFavorite) "Added to favorites" else "Removed from favorites"
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error updating favorites: ${e.message}", Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "Error updating favorites: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
     private fun loadAirQualityData(city: City) {
+
+        Log.d("MapFragment", city.id);
+
+
         bottomSheetBinding.aqiProgressBar.visibility = View.VISIBLE
         
         lifecycleScope.launch {
@@ -356,6 +446,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             } catch (e: Exception) {
                 bottomSheetBinding.aqiProgressBar.visibility = View.GONE
+                Log.e("MapFragment", "Error loading air quality: ${e.message}")
                 Toast.makeText(requireContext(), "Error loading air quality: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -518,6 +609,38 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             putString("cityId", city.id)
         }
         findNavController().navigate(R.id.action_mapFragment_to_cityDetailsFragment, bundle)
+    }
+
+    private fun loadCityFromApi(cityId: String) {
+        binding.progressBar.visibility = View.VISIBLE
+        
+        lifecycleScope.launch {
+            try {
+                Log.d("MapFragment", "Loading city from API: $cityId")
+                val response = apiService.getCityDetails(cityId)
+                
+                binding.progressBar.visibility = View.GONE
+                
+                if (response.isSuccessful && response.body() != null) {
+                    val city = response.body()!!
+                    Log.d("MapFragment", "Successfully loaded city from API: ${city.name}")
+                    // Wait for map to be ready
+                    if (::map.isInitialized) {
+                        updateSelectedCity(city)
+                    } else {
+                        // Save city to use when map is ready
+                        currentCity = city
+                    }
+                } else {
+                    Log.e("MapFragment", "Failed to load city from API: ${response.code()}")
+                    Toast.makeText(requireContext(), "Could not find the selected city", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                binding.progressBar.visibility = View.GONE
+                Log.e("MapFragment", "Error loading city from API", e)
+                Toast.makeText(requireContext(), "Error loading city: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     companion object {

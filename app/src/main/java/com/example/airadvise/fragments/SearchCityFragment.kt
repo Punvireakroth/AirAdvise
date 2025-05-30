@@ -25,13 +25,13 @@ import com.example.airadvise.api.ApiService
 import com.example.airadvise.database.AppDatabase
 import com.example.airadvise.database.CityDao
 import com.example.airadvise.database.CityEntity
-import com.example.airadvise.database.toCity
-import com.example.airadvise.database.toEntity
 import com.example.airadvise.databinding.FragmentSearchCityBinding
 import com.example.airadvise.models.City
 import com.example.airadvise.utils.PreferenceManager
 
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class SearchCityFragment : Fragment() {
     
@@ -166,7 +166,9 @@ class SearchCityFragment : Fragment() {
                     val updatedCities = cities.map { city ->
                         try {
                             val cityId = city.id.toString()
-                            val localCity = cityDao.getCityById(cityId)
+                            val localCity = withContext(Dispatchers.IO) {
+                                cityDao.getCityById(cityId)
+                            }
                             city.copy(isFavorite = localCity?.isFavorite ?: false)
                         } catch (e: Exception) {
                             // If there's an error, just return the original city
@@ -190,7 +192,7 @@ class SearchCityFragment : Fragment() {
     }
     
     private fun loadRecentSearches() {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // Get entities from database
                 val entities: List<CityEntity> = cityDao.getRecentSearches()
@@ -208,22 +210,28 @@ class SearchCityFragment : Fragment() {
                     )
                 }
                 
-                if (recentCities.isEmpty()) {
-                    binding.recentSearchesLabel.visibility = View.GONE
-                } else {
-                    binding.recentSearchesLabel.visibility = View.VISIBLE
-                    searchAdapter.submitList(recentCities)
+                // UI updates must happen on the main thread
+                withContext(Dispatchers.Main) {
+                    if (recentCities.isEmpty()) {
+                        binding.recentSearchesLabel.visibility = View.GONE
+                    } else {
+                        binding.recentSearchesLabel.visibility = View.VISIBLE
+                        searchAdapter.submitList(recentCities)
+                    }
                 }
             } catch (e: Exception) {
-                // Handle error
-                binding.recentSearchesLabel.visibility = View.GONE
+                // UI updates must happen on the main thread
+                withContext(Dispatchers.Main) {
+                    // Handle error
+                    binding.recentSearchesLabel.visibility = View.GONE
+                }
             }
         }
     }
     
     private fun selectCity(city: City) {
         // Update last searched timestamp
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // Create entity directly instead of using the extension function
                 val entity = CityEntity(
@@ -242,13 +250,20 @@ class SearchCityFragment : Fragment() {
                 // Save as last viewed city
                 PreferenceManager.getInstance(requireContext()).saveLastViewedCityId(city.id)
                 
-                // Navigate back to map with selected city
-                val bundle = Bundle().apply {
-                    putString("cityId", city.id)
+                // UI operations need to be on the main thread
+                withContext(Dispatchers.Main) {
+                    // Navigate back to map with selected city
+                    val bundle = Bundle().apply {
+                        putString("cityId", city.id)
+                    }
+                    findNavController().navigate(R.id.action_searchCityFragment_to_mapFragment, bundle)
                 }
-                findNavController().navigate(R.id.action_searchCityFragment_to_mapFragment, bundle)
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error saving city: ${e.message}", Toast.LENGTH_SHORT).show()
+                // UI operations need to be on the main thread
+                withContext(Dispatchers.Main) {
+                    Log.e("SearchCityFragment", "Error saving city", e)
+                    Toast.makeText(requireContext(), "Error saving city: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

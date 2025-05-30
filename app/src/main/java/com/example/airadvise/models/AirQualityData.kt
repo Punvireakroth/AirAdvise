@@ -1,6 +1,7 @@
 package com.example.airadvise.models
 
 import com.google.gson.annotations.SerializedName
+import com.google.gson.annotations.Expose
 
 data class AirQualityData(
     val id: Long,
@@ -18,10 +19,17 @@ data class AirQualityData(
     val createdAt: String? = null,
     val updatedAt: String? = null,
     val isLive: Boolean = true,
+    
+    @Transient
+    @SerializedName("pollutants")
+    private val rawPollutants: String? = null
 ) {
-    val pollutants: Map<PollutantType, Pollutant> by lazy {
-        getPollutants().associateBy { it.type }
-    }
+    val pollutants: Map<PollutantType, Pollutant>
+        get() = try {
+            getPollutants().associateBy { it.type }
+        } catch (e: Exception) {
+            emptyMap()
+        }
     
     // Extract the pollutants values
     fun getPollutants(): List<Pollutant> {

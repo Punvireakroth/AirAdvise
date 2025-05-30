@@ -87,7 +87,7 @@ interface ApiService {
     @GET("api/air-quality/map")
     suspend fun getMapAirQuality(
         @Query("lat") latitude: Double,
-        @Query("lng") longitude: Double,
+        @Query("long") longitude: Double,
         @Query("zoom") zoom: Float,
         @Query("pollutant") pollutant: String
     ): Response<MapAirQualityResponse>
