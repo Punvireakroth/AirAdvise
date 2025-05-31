@@ -114,6 +114,8 @@
     <string name="enable_notifications">បើកបរិច្ចាគ</string>
     <string name="daily_forecast_alerts">ការបង្កើតបរិច្ចាគបន្ទប់បន្ទប់</string>
     <string name="aqi_threshold">ការកំណត់តម្លៃបរិច្ចាគ</string>
+    <string name="map">ផែនទី</string>
+    <string name="settings">ការកំណត់</string>
     
 
     <!-- App Error -->

@@ -117,7 +117,8 @@
     <string name="enable_notifications">Enable Notifications</string>
     <string name="daily_forecast_alerts">Daily Forecast Alerts</string>
     <string name="aqi_threshold">AQI Alert Threshold</string>
-
+    <string name="map">Map</string> 
+    <string name="settings">Settings</string>
 
     <!-- App Error -->
     <string name="unknown_error">Unknown error</string>

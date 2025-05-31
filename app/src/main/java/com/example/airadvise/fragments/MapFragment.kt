@@ -597,11 +597,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             } catch (e: Exception) {
                 binding.progressBar.visibility = View.GONE
                 Log.e("MapDebug", "Exception in loadAirQualityMap", e)
-                Toast.makeText(
-                    requireContext(),
-                    "Error loading map data: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
     }

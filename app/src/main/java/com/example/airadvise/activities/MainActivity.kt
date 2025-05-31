@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         
-        // Set up bottom navigation with the nav controller
         binding.bottomNavigation.setupWithNavController(navController)
         
         // Configure app bar to work with navigation
