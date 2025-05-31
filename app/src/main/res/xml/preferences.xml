@@ -51,11 +51,6 @@
         app:iconSpaceReserved="false">
 
         <Preference
-            android:key="change_password"
-            android:title="Change Password"
-            app:iconSpaceReserved="false" />
-
-        <Preference
             android:key="logout"
             android:title="Logout"
             app:iconSpaceReserved="false" />
