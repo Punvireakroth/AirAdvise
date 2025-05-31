@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="General Settings"
+        app:iconSpaceReserved="false">
+
+        <ListPreference
+            android:key="language"
+            android:title="Language"
+            android:summary="%s"
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:defaultValue="en"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="theme_mode"
+            android:title="Theme"
+            android:summary="%s"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:defaultValue="-1"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            android:key="notifications_enabled"
+            android:title="Enable Notifications"
+            android:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            android:key="daily_forecast_enabled"
+            android:title="Daily Forecast Alerts"
+            android:defaultValue="true"
+            android:dependency="notifications_enabled"
+            app:iconSpaceReserved="false" />
+
+        <SeekBarPreference
+            android:key="aqi_threshold"
+            android:title="AQI Alert Threshold"
+            android:defaultValue="100"
+            android:max="300"
+            app:showSeekBarValue="true"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Account Settings"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="change_password"
+            android:title="Change Password"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="logout"
+            android:title="Logout"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen> 
