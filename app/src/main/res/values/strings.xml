@@ -109,6 +109,15 @@
     <string name="coming_soon_educational_content">Detailed educational content coming soon!</string>
     <string name="pollutant_detail_format">Value: %1$s %2$s\n\n%3$s</string>
 
+    <!-- Settings Strings -->
+    <string name="general_settings">General Settings</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="language">Language</string>
+    <string name="theme">Theme</string>
+    <string name="enable_notifications">Enable Notifications</string>
+    <string name="daily_forecast_alerts">Daily Forecast Alerts</string>
+    <string name="aqi_threshold">AQI Alert Threshold</string>
+
 
     <!-- App Error -->
     <string name="unknown_error">Unknown error</string>

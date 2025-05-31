@@ -26,6 +26,7 @@ import android.net.Uri
 import com.example.airadvise.R
 import com.example.airadvise.utils.LocaleHelper
 import android.util.Log
+import android.content.res.Configuration
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -185,6 +186,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Re-apply the saved locale when configuration changes
+        val language = LocaleHelper.getPersistedLanguage(this)
+        LocaleHelper.setLocale(this, language)
     }
 
     companion object {

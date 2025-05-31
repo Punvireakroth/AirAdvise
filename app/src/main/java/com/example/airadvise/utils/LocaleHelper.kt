@@ -4,7 +4,8 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
-import android.preference.PreferenceManager
+import android.os.LocaleList
+import androidx.preference.PreferenceManager
 import java.util.Locale
 
 object LocaleHelper {
@@ -16,7 +17,7 @@ object LocaleHelper {
     }
 
     fun getPersistedLanguage(context: Context): String {
-        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         return prefs.getString(SELECTED_LANGUAGE, "en") ?: "en"
     }
 
@@ -26,7 +27,7 @@ object LocaleHelper {
     }
 
     private fun persist(context: Context, language: String) {
-        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         prefs.edit().putString(SELECTED_LANGUAGE, language).apply()
     }
 
@@ -37,7 +38,12 @@ object LocaleHelper {
         val resources = context.resources
         val configuration = Configuration(resources.configuration)
         
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val localeList = LocaleList(locale)
+            LocaleList.setDefault(localeList)
+            configuration.setLocales(localeList)
+            return context.createConfigurationContext(configuration)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             configuration.setLocale(locale)
             return context.createConfigurationContext(configuration)
         } else {
@@ -46,6 +52,16 @@ object LocaleHelper {
             @Suppress("DEPRECATION")
             resources.updateConfiguration(configuration, resources.displayMetrics)
             return context
+        }
+    }
+
+    // Helper method to recreate all activities when language changes
+    fun applyLanguageAndRecreate(context: Context, language: String) {
+        setLocale(context, language)
+        
+        // Get the current activity and recreate it
+        if (context is android.app.Activity) {
+            context.recreate()
         }
     }
 } 

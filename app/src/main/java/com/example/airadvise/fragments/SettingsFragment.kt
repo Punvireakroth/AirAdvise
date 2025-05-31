@@ -26,10 +26,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<ListPreference>("language")?.setOnPreferenceChangeListener { _, newValue ->
             val language = newValue as String
             activity?.let {
-                LocaleHelper.setLocale(it, language)
-                
-                // Recreate the activity to apply the language change
-                it.recreate()
+                LocaleHelper.applyLanguageAndRecreate(it, language)
             }
             true
         }
