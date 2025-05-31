@@ -1,13 +1,17 @@
 package com.example.airadvise.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.airadvise.activities.LoginActivity
 import com.example.airadvise.api.ApiClient
@@ -20,22 +24,46 @@ import kotlinx.coroutines.launch
 import android.provider.Settings
 import android.net.Uri
 import com.example.airadvise.R
+import com.example.airadvise.utils.LocaleHelper
+import android.util.Log
+import android.content.res.Configuration
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
 
+    override fun attachBaseContext(newBase: Context) {
+        // Apply the saved locale to the context
+        super.attachBaseContext(LocaleHelper.onAttach(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Set theme from preferences
+        val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this)
+        val themeMode = prefs.getString("theme_mode", "-1")?.toInt() ?: -1
+        AppCompatDelegate.setDefaultNightMode(themeMode)
+        
+        // Initialize binding
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Setup Navigation
+        // Set up toolbar
+        val toolbar = binding.toolbar
+        setSupportActionBar(toolbar)
+        
+        // Set up navigation
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         
-        // Setup Bottom Navigation
         binding.bottomNavigation.setupWithNavController(navController)
+        
+        // Configure app bar to work with navigation
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.homeFragment, R.id.mapFragment, R.id.forecastFragment, R.id.settingsFragment)
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
         
         // Handle deep links if any
         handleIntent(intent)
@@ -157,6 +185,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Re-apply the saved locale when configuration changes
+        val language = LocaleHelper.getPersistedLanguage(this)
+        LocaleHelper.setLocale(this, language)
     }
 
     companion object {

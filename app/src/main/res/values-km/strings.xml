@@ -1,0 +1,123 @@
+<resources>
+    <string name="app_name">AirAdvise</string>
+
+    <!-- Login screen string -->
+    <string name="password">ពាក្យសម្ងាត់</string>
+    <string name="email">អ៊ីមែល</string>
+    <string name="remember_me">ចងចាំខ្ញុំ</string>
+    <string name="forgot_password">ភ្លេចពាក្យសម្ងាត់</string>
+    <string name="login">ចូល</string>
+    <string name="dont_have_account">មិនមានគណនីទេឬ?</string>
+    <string name="app_logo">និមិត្តសញ្ញា Air Advise</string>
+    <string name="feature_coming_soon">នឹងមកដល់ឆាប់ៗនេះ</string>
+    <string name="email_required">តម្រូវឱ្យមានអ៊ីមែល</string>
+    <string name="password_required">តម្រូវឱ្យមានពាក្យសម្ងាត់</string>
+    <string name="invalid_email">អ៊ីមែលមិនត្រឹមត្រូវ</string>
+    <string name="invalid_password">ពាក្យសម្ងាត់មិនត្រឹមត្រូវ</string>
+    <string name="invalid_credentials">ការបញ្ចូលរបស់អ្នកមិនត្រឹមត្រូវ</string>
+    <string name="network_error">អ្នកមានបញ្ហាបណ្ដាញ</string>
+    <string name="login_failed">ការចូលរបស់អ្នកបានបរាជ័យ សូមព្យាយាមម្ដងទៀតនៅពេលក្រោយ</string>
+
+    <!-- Register screen string -->
+    <string name="create_account">បង្កើតគណនី</string>
+    <string name="full_name">ឈ្មោះពេញ</string>
+    <string name="password_requirements">តម្រូវឱ្យមានពាក្យសម្ងាត់</string>
+    <string name="confirm_password">បញ្ជាក់ពាក្យសម្ងាត់</string>
+    <string name="agree_to_terms">លក្ខខណ្ឌ</string>
+    <string name="register">ចុះឈ្មោះ</string>
+    <string name="already_have_account">មានគណនីរួចហើយ?</string>
+    <string name="name_required">តម្រូវឱ្យមានឈ្មោះ</string>
+    <string name="password_too_short">ពាក្យសម្ងាត់របស់អ្នកខ្លីពេក</string>
+    <string name="confirm_password_required">តម្រូវឱ្យបញ្ជាក់ពាក្យសម្ងាត់</string>
+    <string name="passwords_dont_match">ពាក្យសម្ងាត់របស់អ្នកមិនត្រូវគ្នា</string>
+    <string name="please_agree_to_terms">សូមយល់ព្រមនឹងលក្ខខណ្ឌ</string>
+    <string name="email_already_exists">អ៊ីមែលបានចុះឈ្មោះរួចហើយ</string>
+    <string name="validation_error">សូមពិនិត្យទិន្នន័យបញ្ចូលរបស់អ្នក</string>
+    <string name="registration_failed">ការចុះឈ្មោះបានបរាជ័យ។ សូមព្យាយាមម្ដងទៀតនៅពេលក្រោយ។</string>
+    <string name="password_strong">ពាក្យសម្ងាត់របស់អ្នកមើលទៅល្អ 😎</string>
+    <string name="password_medium">ពាក្យសម្ងាត់របស់អ្នកល្អ ប៉ុន្តែអ្នកអាចធ្វើឱ្យវាកាន់តែរឹងមាំ 🔒</string>
+    <string name="password_weak">ពាក្យសម្ងាត់របស់អ្នកខ្សោយ សូមធ្វើឱ្យវាកាន់តែរឹងមាំ 🔒</string>
+    <string name="registration_successful">ការចុះឈ្មោះបានជោគជ័យ! សូមចូលដោយប្រើព័ត៌មានផ្ទាល់ខ្លួនរបស់អ្នក។</string>
+
+    <!-- Menu -->
+    <string name="logout">ចាកចេញ</string>
+    <!-- Bottom menus -->
+    <string name="home">ទំព័រដើម</string>
+    <string name="forecast">ការព្យាករណ៍</string>
+    <string name="locations">ទីតាំង</string>
+    <string name="profile">ប្រវត្តិរូប</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">សួស្តី Fragment ទទេ</string>
+
+    <string name="logout_confirmation">តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?</string>
+    <string name="yes">បាទ/ចាស</string>
+    <string name="no">ទេ</string>
+
+    <!-- Location permission -->
+    <string name="location_permission_required">ត្រូវការការអនុញ្ញាតទីតាំងសម្រាប់ទិន្នន័យគុណភាពខ្យល់</string>
+    <string name="error_unknown">កំហុសមិនស្គាល់</string>
+    <string name="location_not_found">រកមិនឃើញទីតាំង</string>
+    <string name="location_error">កំហុសទីតាំង</string>
+    <string name="updated_at">បានធ្វើបច្ចុប្បន្នភាពនៅ</string>
+
+    <!-- AQI Categories -->
+    <string name="aqi_good">ល្អ</string>
+    <string name="aqi_moderate">មធ្យម</string>
+    <string name="aqi_unhealthy_sensitive">មិនល្អសម្រាប់ក្រុមងាយរងគ្រោះ</string>
+    <string name="aqi_unhealthy">មិនល្អ</string>
+    <string name="aqi_very_unhealthy">មិនល្អខ្លាំង</string>
+    <string name="aqi_hazardous">គ្រោះថ្នាក់</string>
+
+    <!-- AQI Health Implications -->
+    <string name="aqi_good_implications">គុណភាពខ្យល់ត្រូវបានចាត់ទុកថាគួរជាទីពេញចិត្ត និងការបំពុលខ្យល់មានហានិភ័យតិចតួចឬគ្មាន។</string>
+    <string name="aqi_moderate_implications">គុណភាពខ្យល់អាចទទួលយកបាន យ៉ាងណាមិញ សម្រាប់សារធាតុបំពុលមួយចំនួន អាចមានកង្វល់សុខភាពមធ្យមសម្រាប់មនុស្សមួយចំនួនតូច។</string>
+    <string name="aqi_unhealthy_sensitive_implications">សមាជិកនៃក្រុមងាយរងគ្រោះអាចជួបប្រទះផលប៉ះពាល់សុខភាព។ សាធារណជនទូទៅទំនងជាមិនរងផលប៉ះពាល់ទេ។</string>
+    <string name="aqi_unhealthy_implications">មនុស្សគ្រប់គ្នាអាចចាប់ផ្តើមជួបប្រទះផលប៉ះពាល់សុខភាព សមាជិកនៃក្រុមងាយរងគ្រោះអាចជួបប្រទះផលប៉ះពាល់សុខភាពកាន់តែធ្ងន់ធ្ងរ។</string>
+    <string name="aqi_very_unhealthy_implications">ការព្រមានសុខភាពនៃស្ថានភាពអាសន្ន។ ប្រជាជនទាំងមូលទំនងជារងផលប៉ះពាល់កាន់តែខ្លាំង។</string>
+    <string name="aqi_hazardous_implications">ការព្រមានសុខភាព៖ មនុស្សគ្រប់គ្នាអាចជួបប្រទះផលប៉ះពាល់សុខភាពកាន់តែធ្ងន់ធ្ងរ។</string>
+
+    <!-- AQI Precautions -->
+    <string name="aqi_good_precautions">ថ្ងៃនេះជាថ្ងៃល្អសម្រាប់សកម្មភាពនៅខាងក្រៅ។</string>
+    <string name="aqi_moderate_precautions">មនុស្សដែលងាយរងគ្រោះខុសធម្មតាគួរពិចារណាកាត់បន្ថយការខំប្រឹងខាងក្រៅដែលយូរឬខ្លាំង។</string>
+    <string name="aqi_unhealthy_sensitive_precautions">អ្នកដែលមានជំងឺបេះដូងឬសួត មនុស្សចាស់ និងកុមារគួរកាត់បន្ថយការខំប្រឹងដែលយូរឬខ្លាំង។</string>
+    <string name="aqi_unhealthy_precautions">អ្នកដែលមានជំងឺបេះដូងឬសួត មនុស្សចាស់ និងកុមារគួរជៀសវាងការខំប្រឹងដែលយូរឬខ្លាំង។ អ្នកដទៃទៀតគួរកាត់បន្ថយការខំប្រឹងដែលយូរឬខ្លាំង។</string>
+    <string name="aqi_very_unhealthy_precautions">អ្នកដែលមានជំងឺបេះដូងឬសួត មនុស្សចាស់ និងកុមារគួរជៀសវាងរាល់សកម្មភាពរាងកាយនៅខាងក្រៅ។ អ្នកដទៃទៀតគួរជៀសវាងការខំប្រឹងដែលយូរឬខ្លាំង។</string>
+    <string name="aqi_hazardous_precautions">មនុស្សគ្រប់គ្នាគួរជៀសវាងរាល់សកម្មភាពរាងកាយនៅខាងក្រៅ។</string>
+
+    <!-- Layout air quality details -->
+    <string name="updated_time_placeholder">បានធ្វើបច្ចុប្បន្នភាព៖ អម្បាញ់មិញ</string>
+    <string name="pollutants">សារធាតុបំពុល</string>
+
+    <!-- Dialog pollutant details -->
+    <string name="description">ការពិពណ៌នា</string>
+    <string name="health_impact">ផលប៉ះពាល់សុខភាព</string>
+
+    <!-- Pollutant Health Impacts -->
+    <string name="pm25_health_impact">សារធាតុភាគល្អិតល្អិត (PM2.5) អាចចូលទៅក្នុងសួត និងចរន្តឈាម បង្កឱ្យមានជំងឺផ្លូវដង្ហើម និងប្រព័ន្ធឈាមរត់។ វាអាចធ្វើឱ្យជំងឺហឺតកាន់តែធ្ងន់ធ្ងរ កាត់បន្ថយមុខងារសួត និងបង្កើនហានិភ័យនៃការវាយប្រហារបេះដូង។</string>
+    <string name="pm10_health_impact">សារធាតុភាគល្អិតគ្រាតៗ (PM10) អាចបង្កឱ្យមានបញ្ហាផ្លូវដង្ហើម ធ្វើឱ្យជំងឺហឺតកាន់តែធ្ងន់ធ្ងរ និងរួមចំណែកដល់ជំងឺរលាកទងសួត និងជំងឺសួតផ្សេងទៀត។ វាមានគ្រោះថ្នាក់ជាពិសេសចំពោះកុមារ និងមនុស្សចាស់។</string>
+    <string name="o3_health_impact">អូហ្សូន (O3) អាចបង្កឱ្យមានការរលាកផ្លូវខ្យល់ កាត់បន្ថយមុខងារសួត និងធ្វើឱ្យជំងឺហឺតកាន់តែធ្ងន់ធ្ងរ។ ការប៉ះពាល់រយៈពេលយូរអាចនាំឱ្យមានការខូចខាតសួតជាអចិន្ត្រៃយ៍។</string>
+    <string name="no2_health_impact">នីត្រូសែន ឌីអុកស៊ីត (NO2) អាចធ្វើឱ្យរមាស់ប្រព័ន្ធផ្លូវដង្ហើម កាត់បន្ថយមុខងារសួត និងបង្កើនភាពងាយរងគ្រោះចំពោះការឆ្លងមេរោគផ្លូវដង្ហើម។ ការប៉ះពាល់រយៈពេលយូរអាចរួមចំណែកដល់ការអភិវឌ្ឍជំងឺហឺត។</string>
+    <string name="so2_health_impact">ស៊ុលភឺ ឌីអុកស៊ីត (SO2) អាចបណ្តាលឱ្យមានការរមាស់ផ្លូវដង្ហើម ធ្វើឱ្យជំងឺហឺតកាន់តែធ្ងន់ធ្ងរ និងធ្វើឱ្យពិបាកដកដង្ហើម។ វាអាចធ្វើឱ្យជំងឺបេះដូង និងសួតដែលមានស្រាប់កាន់តែអាក្រក់។</string>
+    <string name="co_health_impact">កាបូនម៉ូណូអុកស៊ីត (CO) កាត់បន្ថយសមត្ថភាពរបស់ឈាមក្នុងការដឹកជញ្ជូនអុកស៊ីសែន ដែលនាំឱ្យការផ្គត់ផ្គង់អុកស៊ីសែនទៅសរីរាង្គសំខាន់ៗថយចុះ។ កម្រិតខ្ពស់អាចបណ្តាលឱ្យឈឺក្បាល វិលមុខ ច្របូកច្របល់ និងអាចស្លាប់។</string>
+    <string name="general_pollutant_impact">សារធាតុបំពុលនេះអាចមានផលប៉ះពាល់អវិជ្ជមានលើសុខភាពផ្លូវដង្ហើម និងប្រព័ន្ធឈាមរត់ ជាពិសេសនៅក្នុងបុគ្គលងាយរងគ្រោះដូចជាកុមារ មនុស្សចាស់ និងអ្នកដែលមានស្ថានភាពស្រាប់។</string>
+
+    <!-- Other UI Strings -->
+    <string name="learn_more">ស្វែងយល់បន្ថែម</string>
+    <string name="coming_soon_educational_content">ខ្លឹមសារអប់រំលម្អិតនឹងមកដល់ឆាប់ៗនេះ!</string>
+    <string name="pollutant_detail_format">តម្លៃ៖ %1$s %2$s\n\n%3$s</string>
+
+    <!-- Settings Strings -->
+    <string name="general_settings">ការកំណត់ទូទាត់</string>
+    <string name="account_settings">ការកំណត់គណនី</string>
+    <string name="language">ភាសា</string>
+    <string name="theme">មុខវិជ្ជា</string>
+    <string name="enable_notifications">បើកបរិច្ចាគ</string>
+    <string name="daily_forecast_alerts">ការបង្កើតបរិច្ចាគបន្ទប់បន្ទប់</string>
+    <string name="aqi_threshold">ការកំណត់តម្លៃបរិច្ចាគ</string>
+    <string name="map">ផែនទី</string>
+    <string name="settings">ការកំណត់</string>
+    
+
+    <!-- App Error -->
+    <string name="unknown_error">កំហុសមិនស្គាល់</string>
+</resources> 
