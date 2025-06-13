@@ -56,4 +56,21 @@
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Feedback &amp; Support"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="submit_feedback"
+            android:title="Submit Feedback"
+            android:summary="Send your suggestions or report issues"
+            app:iconSpaceReserved="false" />
+        
+        <Preference
+            android:key="view_feedback_responses"
+            android:title="View Feedback Responses"
+            android:summary="Check responses to your previous feedback"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
 </PreferenceScreen> 

@@ -104,19 +104,13 @@ interface ApiService {
     @DELETE("api/user/favorites/{cityId}")
     suspend fun removeFavoriteCity(@Path("cityId") cityId: String): Response<Unit>
 
+    // Feedback --------
+    @POST("api/feedback")
+    suspend fun submitFeedback(@Body request: FeedbackRequest): Response<Map<String, Any>>
 
-    // Notifications --------
-    @GET("notifications")
-    suspend fun getUserNotifications(): Response<List<UserNotification>>
+    @GET("api/feedback")
+    suspend fun getUserFeedback(): Response<Map<String, List<Feedback>>>
 
-    @PUT("notifications/{id}/read")
-    suspend fun markNotificationAsRead(@Path("id") notificationId: Long): Response<MessageResponse>
-
-    @PUT("notifications/read-all")
-    suspend fun markAllNotificationsAsRead(): Response<MessageResponse>
-
-    @GET("articles/{slug}")
-    suspend fun getArticleBySlug(@Path("slug") slug: String): Response<Article>
 
     // Password management --------
     @POST("auth/password/reset")

@@ -120,4 +120,13 @@
 
     <!-- App Error -->
     <string name="unknown_error">កំហុសមិនស្គាល់</string>
+
+    <!-- Feedback Strings -->
+    <string name="feedback_category">មតិនិងការគម្រោង</string>
+    <string name="submit_feedback">បង្កើតមតិ</string>
+    <string name="submit_feedback_summary">បង្កើតមតិសម្រាប់ការគម្រោង</string>
+    <string name="view_feedback_responses">មើលមតិនិងការគម្រោង</string>
+    <string name="view_feedback_responses_summary">មើលមតិនិងការគម្រោង</string>
+    <string name="no_feedback_history">មិនមានមតិនិងការគម្រោង</string>
+    <string name="feedback_sending">បង្កើតមតិ...</string>
 </resources> 

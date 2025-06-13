@@ -143,4 +143,13 @@
         <item>-1</item>
     </string-array>
 
+    <!-- Add these strings to your strings.xml -->
+    <string name="feedback_category">Feedback &amp; Support</string>
+    <string name="submit_feedback">Submit Feedback</string>
+    <string name="submit_feedback_summary">Send your suggestions or report issues</string>
+    <string name="view_feedback_responses">View Feedback Responses</string>
+    <string name="view_feedback_responses_summary">Check responses to your previous feedback</string>
+    <string name="no_feedback_history">No feedback history found</string>
+    <string name="feedback_sending">Submitting feedback...</string>
+
 </resources>
