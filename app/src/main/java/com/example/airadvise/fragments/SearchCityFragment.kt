@@ -26,6 +26,10 @@ import com.example.airadvise.database.AppDatabase
 import com.example.airadvise.database.CityDao
 import com.example.airadvise.database.CityEntity
 import com.example.airadvise.databinding.FragmentSearchCityBinding
+import com.example.airadvise.extensions.hide
+import com.example.airadvise.extensions.hideLoading
+import com.example.airadvise.extensions.show
+import com.example.airadvise.extensions.showLoading
 import com.example.airadvise.models.City
 import com.example.airadvise.utils.PreferenceManager
 
@@ -135,12 +139,12 @@ class SearchCityFragment : Fragment() {
     }
     
     private fun searchCities(query: String) {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.noResultsText.visibility = View.GONE
+        binding.progressBar.showLoading()
+        binding.noResultsText.hide()
         
         if (query.isBlank()) {
             loadRecentSearches()
-            binding.progressBar.visibility = View.GONE
+            binding.progressBar.hideLoading()
             return
         }
         
@@ -150,16 +154,16 @@ class SearchCityFragment : Fragment() {
             try {
                 // Use safeApiCall if needed, similar to other fragments
                 val response = apiService.searchCities(query)
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
                 
                 if (response.isSuccessful) {
                     val paginatedResponse = response.body()
                     val cities = paginatedResponse?.data ?: emptyList()  
                     
                     if (cities.isEmpty()) {
-                        binding.noResultsText.visibility = View.VISIBLE
+                        binding.noResultsText.show()
                     } else {
-                        binding.noResultsText.visibility = View.GONE
+                        binding.noResultsText.hide()
                     }
                     
                     // Update favorite status from local database
@@ -184,7 +188,7 @@ class SearchCityFragment : Fragment() {
                     Toast.makeText(requireContext(), "Error searching cities: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
                 Log.e("SearchCity", "Error searching cities", e)
                 Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }

@@ -19,25 +19,20 @@ import com.google.android.gms.maps.model.UrlTileProvider
 import com.google.android.gms.maps.model.MapStyleOptions
 
 import android.Manifest
-import android.content.pm.PackageManager
-import android.location.Location
 import android.util.Log
 import android.widget.Toast
 
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 import com.example.airadvise.databinding.FragmentMapBinding
 import com.example.airadvise.databinding.BottomSheetCityInfoBinding
+import com.example.airadvise.extensions.hasLocationPermission
+import com.example.airadvise.extensions.hideLoading
+import com.example.airadvise.extensions.showLoading
 import com.example.airadvise.models.City
 import com.example.airadvise.models.AirQualityData
-import com.example.airadvise.models.Pollutant
 import com.example.airadvise.models.PollutantType
 import com.example.airadvise.api.ApiService
 import com.example.airadvise.database.AppDatabase
@@ -45,9 +40,7 @@ import com.example.airadvise.database.CityDao
 import com.example.airadvise.utils.PreferenceManager
 import com.example.airadvise.utils.PollutantColorUtils
 import com.example.airadvise.api.ApiClient
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.TileOverlay
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 import androidx.lifecycle.lifecycleScope
@@ -55,13 +48,13 @@ import androidx.navigation.fragment.findNavController
 import com.example.airadvise.R
 
 import com.example.airadvise.models.request.FavoriteCityRequest
-import com.example.airadvise.models.response.MapAirQualityResponse
 import java.net.URL
 import android.content.res.Resources
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall
+import androidx.core.content.ContextCompat
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -171,11 +164,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         map.uiSettings.isMyLocationButtonEnabled = true
 
         // Request location permission if needed
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (hasLocationPermission()) {
             map.isMyLocationEnabled = true
         } else {
             requestLocationPermission()
@@ -235,11 +224,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun getCurrentLocation() {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (hasLocationPermission()) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {
                     val latLng = LatLng(it.latitude, it.longitude)
@@ -296,13 +281,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun fetchCityAtLocation(latitude: Double, longitude: Double) {
-        binding.progressBar.visibility = View.VISIBLE
+        binding.progressBar.showLoading()
 
         lifecycleScope.launch {
             try {
                 Log.d("MapFragment", "Fetching city at location: $latitude, $longitude")
                 val response = apiService.searchCities("nearby:$latitude,$longitude")
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
 
                 if (response.isSuccessful) {
                     val cities = response.body()?.data ?: emptyList()
@@ -323,7 +308,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     ).show()
                 }
             } catch (e: Exception) {
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
                 Log.e("MapFragment", "Exception in fetchCityAtLocation", e)
                 Toast.makeText(
                     requireContext(),
@@ -420,14 +405,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         Log.d("MapFragment", city.id);
 
 
-        bottomSheetBinding.aqiProgressBar.visibility = View.VISIBLE
+        bottomSheetBinding.aqiProgressBar.showLoading()
         lifecycleScope.launch {
             try {
                 val response = safeApiCall {
                     apiService.getCityAirQuality(city.id)
                 }
 
-                bottomSheetBinding.aqiProgressBar.visibility = View.GONE
+                bottomSheetBinding.aqiProgressBar.hideLoading()
 
                 when (response) {
                     is Resource.Success -> {
@@ -448,7 +433,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     }
                 }
             } catch (e: Exception) {
-                bottomSheetBinding.aqiProgressBar.visibility = View.GONE
+                bottomSheetBinding.aqiProgressBar.hideLoading()
                 Log.e("MapFragment", "Error loading air quality: ${e.message}")
                 Toast.makeText(
                     requireContext(),
@@ -523,7 +508,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun loadAirQualityMap(city: City) {
         // Show progress indicator
-        binding.progressBar.visibility = View.VISIBLE
+        binding.progressBar.showLoading()
 
         lifecycleScope.launch {
             try {
@@ -539,7 +524,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     currentPollutant.name
                 )
 
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
 
                 if (response.isSuccessful && response.body() != null) {
                     val mapData = response.body()!!
@@ -595,7 +580,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     ).show()
                 }
             } catch (e: Exception) {
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
                 Log.e("MapDebug", "Exception in loadAirQualityMap", e)
             }
         }
@@ -643,14 +628,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun loadCityFromApi(cityId: String) {
-        binding.progressBar.visibility = View.VISIBLE
+        binding.progressBar.showLoading()
 
         lifecycleScope.launch {
             try {
                 Log.d("MapFragment", "Loading city from API: $cityId")
                 val response = apiService.getCityDetails(cityId)
 
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
 
                 if (response.isSuccessful && response.body() != null) {
                     val city = response.body()!!
@@ -671,7 +656,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     ).show()
                 }
             } catch (e: Exception) {
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
                 Log.e("MapFragment", "Error loading city from API", e)
                 Toast.makeText(
                     requireContext(),

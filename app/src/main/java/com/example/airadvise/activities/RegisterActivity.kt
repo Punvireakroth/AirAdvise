@@ -11,6 +11,11 @@ import androidx.lifecycle.lifecycleScope
 import com.example.airadvise.R
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.ActivityRegisterBinding
+import com.example.airadvise.extensions.hideLoading
+import com.example.airadvise.extensions.showLoading
+import com.example.airadvise.extensions.validateEmail
+import com.example.airadvise.extensions.validateNotEmpty
+import com.example.airadvise.extensions.validatePassword
 import com.example.airadvise.models.request.RegisterRequest
 import com.example.airadvise.utils.Validator
 import com.example.airadvise.utils.Resource
@@ -96,7 +101,7 @@ class RegisterActivity: AppCompatActivity() {
 
     private fun performRegistration() {
         // Show loading indicator
-        binding.progressBar.visibility = View.VISIBLE
+        binding.progressBar.showLoading()
         binding.btnRegister.isEnabled = false
 
         val name = binding.etName.text.toString().trim()
@@ -150,69 +155,41 @@ class RegisterActivity: AppCompatActivity() {
             }
             
             // Hide loading indicator
-            binding.progressBar.visibility = View.GONE
+            binding.progressBar.hideLoading()
             binding.btnRegister.isEnabled = true
         }
     }
 
     private fun validateInputs(): Boolean {
-        val name = binding.etName.text.toString().trim()
-        val email = binding.etEmail.text.toString().trim()
         val password = binding.etPassword.text.toString()
         val confirmPassword = binding.etConfirmPassword.text.toString()
         val agreeToTerms = binding.cbTerms.isChecked
 
-        // Reset error states
-        binding.tilName.error = null
-        binding.tilEmail.error = null
-        binding.tilPassword.error = null
-        binding.tilConfirmPassword.error = null
-
-        // Validate name
-        if (name.isEmpty()) {
-            binding.tilName.error = getString(R.string.name_required)
-            return false
-        }
-
-        // Validate email
-        if (email.isEmpty()) {
-            binding.tilEmail.error = getString(R.string.email_required)
-            return false
-        }
-
-        if (!Validator.isValidEmail(email)) {
-            binding.tilEmail.error = getString(R.string.invalid_email)
-            return false
-        }
-
-        // Validate password
-        if (password.isEmpty()) {
-            binding.tilPassword.error = getString(R.string.password_required)
-            return false
-        }
-
-        if (!Validator.isValidPassword(password)) {
-            binding.tilPassword.error = getString(R.string.password_too_short)
-            return false
-        }
-
+        // Validate all fields using extension functions
+        val isNameValid = binding.tilName.validateNotEmpty(this, R.string.name_required)
+        val isEmailValid = binding.tilEmail.validateEmail(this)
+        val isPasswordValid = binding.tilPassword.validatePassword(this)
+        
         // Validate confirm password
-        if (confirmPassword.isEmpty()) {
+        binding.tilConfirmPassword.error = null
+        val isConfirmPasswordValid = if (confirmPassword.isEmpty()) {
             binding.tilConfirmPassword.error = getString(R.string.confirm_password_required)
-            return false
-        }
-
-        if (password != confirmPassword) {
+            false
+        } else if (password != confirmPassword) {
             binding.tilConfirmPassword.error = getString(R.string.passwords_dont_match)
-            return false
+            false
+        } else {
+            true
         }
 
         // Validate terms agreement
-        if (!agreeToTerms) {
+        val areTermsAccepted = if (!agreeToTerms) {
             Toast.makeText(this, getString(R.string.please_agree_to_terms), Toast.LENGTH_SHORT).show()
-            return false
+            false
+        } else {
+            true
         }
 
-        return true
+        return isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid && areTermsAccepted
     }
 }

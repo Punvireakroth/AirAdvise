@@ -16,6 +16,8 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.airadvise.activities.LoginActivity
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.ActivityMainBinding
+import com.example.airadvise.extensions.hideLoading
+import com.example.airadvise.extensions.showLoading
 import com.example.airadvise.utils.LocationPermissionManager
 import com.example.airadvise.utils.SessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -115,7 +117,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 // Show loading
-                binding.progressBar.visibility = View.VISIBLE
+                binding.progressBar.showLoading()
                 
                 // Call logout API
                 val response = ApiClient.createApiService(this@MainActivity).logout()
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity() {
                 SessionManager.clearSession(this@MainActivity)
                 navigateToLogin()
             } finally {
-                binding.progressBar.visibility = View.GONE
+                binding.progressBar.hideLoading()
             }
         }
     }
