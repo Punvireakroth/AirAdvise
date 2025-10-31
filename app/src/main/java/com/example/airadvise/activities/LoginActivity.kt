@@ -9,6 +9,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.airadvise.R
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.ActivityLoginBinding
+import com.example.airadvise.extensions.hideLoading
+import com.example.airadvise.extensions.showLoading
+import com.example.airadvise.extensions.validateEmail
+import com.example.airadvise.extensions.validatePassword
 import com.example.airadvise.models.request.LoginRequest
 import com.example.airadvise.utils.Validator
 import com.example.airadvise.utils.SessionManager
@@ -63,8 +67,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun performLogin() {
         // Show loading indicator
-        binding.progressBar.visibility = View.VISIBLE
-
+        binding.progressBar.showLoading()
         binding.btnLogin.isEnabled = false
 
         val email = binding.etEmail.text.toString().trim()
@@ -115,36 +118,16 @@ class LoginActivity : AppCompatActivity() {
             }
 
             // Hide loading indicator
-            binding.progressBar.visibility = View.GONE
+            binding.progressBar.hideLoading()
             binding.btnLogin.isEnabled = true
         }
     }
 
     private fun validateInputs(): Boolean {
-        val email = binding.etEmail.text.toString().trim()
-        val password = binding.etPassword.text.toString().trim()
-
-        // Reset error states
-        binding.tilEmail.error = null
-        binding.tilPassword.error = null
-
-        // Validate email
-        if (!Validator.isNotEmpty(email)) {
-            binding.tilEmail.error = getString(R.string.email_required)
-            return false
-        }
-
-        if (!Validator.isValidEmail(email)) {
-            binding.tilEmail.error = getString(R.string.invalid_email)
-            return false
-        }
-
-        // Validate password
-        if (!Validator.isNotEmpty(password)) {
-            binding.tilPassword.error = getString(R.string.password_required)
-            return false
-        }
-
-        return true
+        // Validate email and password using extension functions
+        val isEmailValid = binding.tilEmail.validateEmail(this)
+        val isPasswordValid = binding.tilPassword.validatePassword(this)
+        
+        return isEmailValid && isPasswordValid
     }
 }

@@ -24,6 +24,7 @@ import com.example.airadvise.R
 import com.example.airadvise.api.ApiClient
 import com.example.airadvise.databinding.DialogPollutantDetailsBinding
 import com.example.airadvise.databinding.FragmentHomeBinding
+import com.example.airadvise.extensions.hasLocationPermission
 import com.example.airadvise.models.Activity
 import com.example.airadvise.models.AirQualityData
 import com.example.airadvise.models.AirQualityForecast
@@ -121,14 +122,6 @@ class HomeFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         stopLocationUpdates()
-    }
-
-    private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-            requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun getCurrentLocation() {
