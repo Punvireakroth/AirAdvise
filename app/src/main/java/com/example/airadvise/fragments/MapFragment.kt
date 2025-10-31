@@ -19,17 +19,10 @@ import com.google.android.gms.maps.model.UrlTileProvider
 import com.google.android.gms.maps.model.MapStyleOptions
 
 import android.Manifest
-import android.content.pm.PackageManager
-import android.location.Location
 import android.util.Log
 import android.widget.Toast
 
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -37,11 +30,9 @@ import com.example.airadvise.databinding.FragmentMapBinding
 import com.example.airadvise.databinding.BottomSheetCityInfoBinding
 import com.example.airadvise.extensions.hasLocationPermission
 import com.example.airadvise.extensions.hideLoading
-import com.example.airadvise.extensions.setLoading
 import com.example.airadvise.extensions.showLoading
 import com.example.airadvise.models.City
 import com.example.airadvise.models.AirQualityData
-import com.example.airadvise.models.Pollutant
 import com.example.airadvise.models.PollutantType
 import com.example.airadvise.api.ApiService
 import com.example.airadvise.database.AppDatabase
@@ -49,9 +40,7 @@ import com.example.airadvise.database.CityDao
 import com.example.airadvise.utils.PreferenceManager
 import com.example.airadvise.utils.PollutantColorUtils
 import com.example.airadvise.api.ApiClient
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.TileOverlay
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 
 import androidx.lifecycle.lifecycleScope
@@ -59,13 +48,13 @@ import androidx.navigation.fragment.findNavController
 import com.example.airadvise.R
 
 import com.example.airadvise.models.request.FavoriteCityRequest
-import com.example.airadvise.models.response.MapAirQualityResponse
 import java.net.URL
 import android.content.res.Resources
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall
+import androidx.core.content.ContextCompat
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 

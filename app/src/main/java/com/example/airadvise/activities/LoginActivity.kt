@@ -2,7 +2,6 @@ package com.example.airadvise.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +13,6 @@ import com.example.airadvise.extensions.showLoading
 import com.example.airadvise.extensions.validateEmail
 import com.example.airadvise.extensions.validatePassword
 import com.example.airadvise.models.request.LoginRequest
-import com.example.airadvise.utils.Validator
 import com.example.airadvise.utils.SessionManager
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall

@@ -1,7 +1,6 @@
 package com.example.airadvise.fragments
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -15,24 +14,18 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.airadvise.R
 import com.example.airadvise.api.ApiClient
-import com.example.airadvise.databinding.DialogPollutantDetailsBinding
 import com.example.airadvise.databinding.FragmentHomeBinding
 import com.example.airadvise.extensions.hasLocationPermission
 import com.example.airadvise.models.Activity
 import com.example.airadvise.models.AirQualityData
 import com.example.airadvise.models.AirQualityForecast
 import com.example.airadvise.models.Location
-import com.example.airadvise.models.Pollutant
 import com.example.airadvise.utils.AQIUtils
 import com.example.airadvise.utils.AirQualityCache
-import com.example.airadvise.utils.BestDayRecommendation
 import com.example.airadvise.utils.LocationProvider
 import com.example.airadvise.utils.Resource
 import com.example.airadvise.utils.safeApiCall
